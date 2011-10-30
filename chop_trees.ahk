@@ -26,10 +26,11 @@ SysGet, workableArea, MonitorWorkArea ; The area, in pixels, that a window may c
 screenWidth := workableAreaRight ; The width of the screen that a window may consume, in pixels
 screenHeight := workableAreaBottom ; The height of the screen that a window may consume, in pixels
 configFolder = %A_MyDocuments%\Toadwater Accelerator ; The folder location of the Accelerator's configuration file
-configFile = %configFolder%\config.ahk ; The location of the Accelerator's configuration file
+configFile = %configFolder%\config.txt ; The location of the Accelerator's configuration file
 
 ; ------------------------------- Part 3 | Application specifications -------------------------------
 inventorySpacing = 14 ; The amount of space, in pixels, between each of the items in the inventory
+inventoryClick := screenWidth - 100 ; The x-position of the inventory list
 dockBarWidth = 166 ; The width, in pixels, of the right-side dock bar
 cellSize = 77 ; The width and height, in pixels, of a cell, when the game is configured as instructed above
 
@@ -38,16 +39,30 @@ cellPaddingY := Round(Mod(((screenHeight - (windowBorder + menuHeight)) / 2) - R
 cellsX := Floor((screenWidth - dockBarWidth - (cellPaddingX * 2)) / cellSize) ; The number of visibile cells to evaluate in the X direction
 cellsY := Floor((screenHeight - (windowBorder + menuHeight) - (cellPaddingY * 2)) / cellSize) ; The number of visibile cells to evaluate in the Y direction
 
-healthGood = 00C000 ; Health meter color indicator, good
-healthFair = 00C0C0 ; Health meter color indicator, fair
-healthPoor = 0000C0 ; Health meter color indicator, poor
+balsamFir = 0xACB3BC ; The color of a targeted location that identifies a Balsam Fir Tree
+
+healthGood = 0x00C000 ; Health meter color indicator, good
+healthFair = 0x00C0C0 ; Health meter color indicator, fair
+healthPoor = 0x0000C0 ; Health meter color indicator, poor
 
 ; ------------------------------- Part 4 | Variables manipulated by the macro -------------------------------
 itemLoc = 0 ; A generic variable to store the location of an inventory item
 wizardStep = 1 ; A tracking variable to hold which step of the setup wizard the user is currently on
 
+mouseX = 0 ; The x position of the mouse relative to the screen, in pixels
+mouseY = 0 ; The y position of the mouse relative to the screen, in pixels
+color = 0 ; The hexadecimal color under the mouse
 hoverCellX = 0 ; The x position of the cell number that the mouse currently hovering over
 hoverCellY = 0 ; The y position of the cell number that the mouse currently hovering over
+loops = 0 ; The number of times the cell scanning algorthim must loop in order to cover every visible cell
+loopCount = 0 ; A variable to hold the current A_Index value of a parent loop
+breakLoop = 0 ; A variable containing directions to break out a parent loop
+moveUp = 0 ; The amount of tiles going up that the mouse should hover over
+moveLeft = 0 ; The amount of tiles going left that the mouse should hover over
+moveDown = 0 ; The amount of tiles going down that the mouse should hover over
+moveRight = 0 ; The amount of tiles going right that the mouse should hover over
+locationX = 0 ; The x position of a targeted object
+locationY = 0 ; The y position of a targeted object
 
 ; -------------------------------
 ; Function library
@@ -222,7 +237,7 @@ layout(action) {
 
 ; Create and manipulate the finish page
 finish(action) {
-  mainText = The Toadwater Accelerator now has enough information about your system to play this game automatically.`nYou will not be required to run through this setup again, as your configuration has been saved to:`n%A_MyDocuments%\Toadwater Accelerator\config.ahk`n`nClick "Finish" below, and the Accelerator will close your existing Toadwater window, log in again as you,`nand being gameplay.
+  mainText = The Toadwater Accelerator now has enough information about your system to play this game automatically.`nYou will not be required to run through this setup again, as your configuration has been saved to:`n%configFile%`n`nClick "Finish" below, and the Accelerator will close your existing Toadwater window, log in again as you,`nand being gameplay.
   
   if (action = "create") {
     Gui, Add, Text, x10 y60, %mainText% ; ClassNN = "Static51" according to Window Spy
@@ -250,12 +265,191 @@ findItem(itemName) {
 ; Select a particular item from the inventory list
 selectTool(itemName) {
 ; Globalize the scope of the needed variables for use within this function
-  global screenPlayPadding, inventorySpacing, inventoryClick
+  global windowBorder, menuHeight, inventorySpacing, inventoryClick
 
 ; Select the item
   itemLoc := findItem(itemName)
-  inventoryItem := screenPlayPadding + (inventorySpacing * itemLoc)
+  inventoryItem := (windowBorder + menuHeight) + (inventorySpacing * itemLoc)
   Click %inventoryClick%, %inventoryItem%
+}
+
+; Move the mouse to a particular x and y cell
+mouseMove(x, y) {
+; Globalize the scope of the needed variables for use within this function
+  global hoverCellX, hoverCellY, cellPaddingX, cellSize, windowBorder, menuHeight, cellPaddingY
+  
+  hoverCellX = %x%
+  hoverCellY = %y%
+  
+; The +10 or +30 are for good measure, just be sure it is not clicking off the tile in the x or y directions
+  MouseMove, cellPaddingX + 10 + ((x - 1) * cellSize), windowBorder + menuHeight + cellPaddingY + 30 + ((y - 1) * cellSize)
+}
+
+; Get the hexadecimal color under the pointer
+getColor() {
+  MouseGetPos mouseX, mouseY
+  PixelGetColor color, %mouseX%, %mouseY%, RGB
+  return color
+}
+
+; Check and see if the current cell contains a specific object
+is(object) {
+  if (getColor() = object) {
+    return true
+  } else {
+    return false
+  }
+}
+
+; Locate the closest x and y position of a given object
+locate(object) {
+; Globalize the scope of the needed variables for use within this function
+  global cellsX, cellsY, loops, loopCount, hoverCellX, hoverCellY, breakLoop, moveUp, moveRight, moveDown, moveLeft, locationX, locationY
+
+; Recursively look for a the object by scanning from the center, out to locate the closest one
+  mouseMove(Ceil(cellsX / 2), Ceil(cellsY / 2))
+  
+; Calculate the number of times the loop below must execute
+  if (cellsX >= cellsY) {
+    loops := Floor(cellsX / 2)
+  } else {
+    loops := Floor(cellsY / 2)
+  }
+  
+  loop %loops% {
+  ; Track the outer loop A_Index value
+    loopCount := A_Index
+    
+  ; For the first two moves round, it will be a tad different...
+    if (loopCount = 1) {
+    ; Moving left one
+      mouseMove(hoverCellX - 1, hoverCellY)
+      
+    ; Check and see if this is the object
+      if (is(object) = true) {
+        break
+      }
+      
+    ; Moving up
+      mouseMove(hoverCellX, hoverCellY - 1)
+      
+    ; Check and see if this is the object
+      if (is(object) = true) {
+        break
+      }
+  ; All other loops can be solved with this algorthim...
+    } else {
+    ; Moving up
+      moveUp := loopCount + (loopCount - 1)
+         
+      loop %moveUp% {
+      ; Don't go off the gameplay area
+        if (hoverCellY - 1 >= 1) {
+          mouseMove(hoverCellX, hoverCellY - 1)
+        } else {
+          break
+        }
+        
+      ; Check and see if this is the object
+        if (is(object) = true) {
+          breakLoop = true
+          break
+        }
+      }
+    
+    ; Did we find a it yet?
+      if (breakLoop) {
+        breakLoop = false
+        break
+      }
+    }
+  
+  ; Moving right
+    moveRight := 2 * loopCount
+    
+    loop %moveRight% {
+    ; Don't go off the gameplay area
+      if (hoverCellX + 1 <= cellsX) {
+        mouseMove(hoverCellX + 1, hoverCellY)
+      } else {
+        break
+      }
+      
+    ; Check and see if this is the object
+      if (is(object) = true) {
+        breakLoop = true
+        break
+      }
+    }
+  
+  ; Did we find a it yet?
+    if (breakLoop) {
+      breakLoop = false
+      break
+    }
+    
+  ; Moving down
+    moveDown := 2 * loopCount
+    
+    loop %moveDown% {
+    ; Don't go off the gameplay area
+      if (hoverCellY + 1 <= cellsY) {
+        mouseMove(hoverCellX, hoverCellY + 1)
+      } else {
+        break
+      }
+    
+    ; Check and see if this is the object
+      if (is(object) = true) {
+        breakLoop = true
+        break
+      }
+    }
+  
+  ; Did we find a it yet?
+    if (breakLoop) {
+      breakLoop = false
+      break
+    }
+    
+  ; Moving left
+    moveLeft := (2 * loopCount) + 1
+    
+    loop %moveLeft% {
+    ; Don't go off the gameplay area
+      if (hoverCellX - 1 >= 1) {
+        mouseMove(hoverCellX - 1, hoverCellY)
+      } else {
+        break
+      }
+      
+    ; Check and see if this is the object
+      if (is(object) = true) {
+        breakLoop = true
+        break
+      }
+    }
+  
+  ; Did we find a it yet?
+    if (breakLoop) {
+      breakLoop = false
+      break
+    }
+  }
+  
+; Did the loop break on the targeted object, or did it happen to end on the targeted object?
+  if (is(object) = true) {
+    locationX = hoverCellX
+    locationY = hoverCellY
+  } else {
+    locationX = 0
+    locationY = 0
+  }
+}
+
+; Go one cell away from a targeted location, usually to perform some action on the cell
+goBy(x, y) {
+
 }
 
 ; -------------------------------
@@ -385,13 +579,18 @@ if (!FileExist(configFile)) {
     ; Show the finish page
       finish("show")
       
-    ; Save the configuration into a plain-text file, inside of My Documents > Toadwater Accelerator
+    ; Save the configuration into an plain text file, inside of My Documents > Toadwater Accelerator
       FileCreateDir, %configFolder%
-      FileAppend, %windowName%`n, %configFile%
+      FileAppend, %windowName%|, %configFile%
       
       loop 20 {
         value := inv%A_Index%
-        FileAppend, %value%`n, %configFile%
+        
+        if (A_Index <= 19) {
+          FileAppend, %value%|, %configFile%
+        } else {
+          FileAppend, %value%, %configFile%
+        }
       }
       
     ; Hide the old navigation buttons, and replace them with a "Finish" button
@@ -472,7 +671,7 @@ if (!FileExist(configFile)) {
 ; Parse the config file created by the setup
   FileRead, configContents, %configFile%
   
-  Loop, parse, configContents, `n
+  Loop, parse, configContents, |
   {
     if (A_Index = 1) {
       windowName = %A_LoopField%
@@ -490,8 +689,11 @@ if (!FileExist(configFile)) {
 ; Continue the macro after this keystroke, triggered by the program
 ^!j::
 
+; The actual title of the Toadwater window, when the user is logged in, defined here, since the config file is included just above
+parsedName = TWC (%windowName%) 
+
 ; Close any existing Toadwater windows, then open, focus on, and maximize on a new Toadwater window
-if (WinExist("TWC (%windowName%)")) {
+if (WinExist(parsedName)) {
   WinClose TWC (%windowName%)
   sleep 1000
   Run %A_ProgramFiles%\Toadwater\TWC.exe
@@ -508,27 +710,25 @@ WinActivate, TWC
 WinClose, Login
 WinMaximize, TWC
 
-; Log the user in
-Send ^l
-Send {Enter}
+; Keep trying to login, as it doesn't always work the first time :(
+loop {
+  Send ^l
+  Send {Enter}
+  
+  sleep 5000
+  
+  if (WinExist(parsedName)) {
+    break
+  }
+}
 
 ; -------------------------------
 ; Action
 ; -------------------------------
 
 ; Identify where the walking staff is in the inventory, and select it
-selectTool("Toadwater Staff")
+;selectTool("Toadwater Staff")
 
-; Move the mouse to the vertical center of the top-left cell, and track the location of the focused cell
-;MouseMove, 0, screenPlayPadding + (cellSize / 2)
-
-; Recursively look for a tree by scanning from the center, out to locate the closest tree
-;loop {
-; For the first 2 cells, go left one and then up one, then continue the pattern below
-;  if (hoverCellX = 0) {
-;    hoverCellX := Floor(cellsX / 2) - 1
-;    
-;  }
-;  
-;   MouseMove, (hoverCellX - 1) * cellSize, screenPlayPadding + (cellSize / 2) + (cellSize * (hoverCellY - 1)), 0
-;}
+; Find a Balsam Fir Tree
+locate(balsamFir)
+goBy(locationX, locationY)
