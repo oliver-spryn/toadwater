@@ -447,9 +447,67 @@ locate(object) {
   }
 }
 
+; Monitor the progress bars
+monitor(bar) {
+; Globalize the scope of the needed variables for use within this function
+  global windowBorder, menuHeight, screenWidth, dockBarWidth, healthGood, healthFair, healthPoor
+
+  if (bar = "health") {
+    barY := 575 + windowBorder + menuHeight
+    barX := screenWidth - dockBarWidth + 15
+    
+    MouseMove, %barX%, %barY%
+    sleep 1000
+    
+    if (getColor() = healthGood) {
+      return "good"
+    } else if (getColor() = healthFair) {
+      return "fair"
+    } else {
+      return "poor"
+    }
+  }
+}
+
+; Find the 
+
 ; Go one cell away from a targeted location, usually to perform some action on the cell
 goBy(x, y) {
+; Globalize the scope of the needed variables for use within this function
+  global cellsX, cellsY, hoverCellX, hoverCellY
+  
+; Calculate the location of the targeted tile, relative to the current position
+  if (x > cellsX) {
+    goX := x - cellsX
+  } else {
+    goX := cellsX - x
+  }
+  MsgBOx % goX
+  if (y - 1 > cellsY) {
+    y := y - 1 - cellsY
+  } else {
+    y := cellsY - y - 1
+  }
 
+; Go in the x direction
+  loop %goX% {
+    if (goX > cellsX) {
+      mouseMove(hoverCellX + 1, hoverCellY)
+      Click
+    } else {
+       mouseMove(hoverCellX - 1, hoverCellY)
+    }
+  }
+  
+; Go in the y direction
+  loop %x% {
+    if (y > cellsY) {
+      mouseMove(hoverCellX, hoverCellY + 1)
+      Click
+    } else {
+       mouseMove(hoverCellX, hoverCellY - 1)
+    }
+  }
 }
 
 ; -------------------------------
