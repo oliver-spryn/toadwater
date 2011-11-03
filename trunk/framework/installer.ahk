@@ -185,6 +185,8 @@ layout(action) {
 
 ; Create and manipulate the finish page
 finish(action) {
+  global configFile
+
   mainText = The Toadwater Accelerator now has enough information about your system to play this game automatically.`nYou will not be required to run through this setup again, as your configuration has been saved to:`n%configFile%`n`nClick "Finish" below, and the Accelerator will close your existing Toadwater window, log in again as you,`nand being gameplay.
   
   if (action = "create") {

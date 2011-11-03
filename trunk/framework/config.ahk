@@ -60,7 +60,17 @@ if (WinExist(parsedName)) {
   Run %A_ProgramFiles%\Toadwater\TWC.exe
 }
 
-sleep 1000
+; Close any existing Window Spy windows, and reopen it
+if (WinExist("Active Window Info (Shift-Alt-Tab to freeze display)")) {
+  WinClose Active Window Info (Shift-Alt-Tab to freeze display)
+  Run %A_ProgramFiles%\AutoHotkey\AU3_Spy.exe
+} else {
+  Run %A_ProgramFiles%\AutoHotkey\AU3_Spy.exe
+}
+
+sleep 2000
+WinActivate, TWC
+WinMinimize, Active Window Info (Shift-Alt-Tab to freeze display)
 WinActivate, TWC
 WinClose, Login
 WinMaximize, TWC
@@ -97,19 +107,43 @@ Gui, Add, Text, x0 y30 w300 Center cBlack, Please wait while the marco is config
 MouseMove, screenWidth, screenHeight - 10
 sleep 1000
 
+; Find the width of the dockbar
+dockBarWidth = 0
+
 loop {
+  global dockBarWidth
+
 ; Move the mouse to the appropriate location
   MouseMove, screenWidth - A_Index, screenHeight - 10
 
 ; Parse the color from Window Spy
   WinGetText, color, Active Window Info (Shift-Alt-Tab to freeze display)
-  sleep 100
   colorPos := InStr(color, "0x")
   StringTrimLeft, colorTrim, color, colorPos - 1
   StringSplit, colorParsed, colorTrim, %A_Space%
   
   if (colorParsed1 != 0xF0F0F0) {
-    dockBarWidth := A_Index ; The width, in pixels, of the right-side dock bar
+    dockBarWidthGuess := A_Index ; A closeish guess of the width, in pixels, of the right-side dock bar
+  
+  ; Odds are, we went too fast and lost some precision... so do some fine tuning
+    loop {
+    ; Move the mouse to the appropriate location
+      MouseGetPos mouseX, mouseY
+      MouseMove, mouseX + 1, screenHeight - 10
+      sleep 750
+      
+    ; Parse the color from Window Spy
+      WinGetText, criticalColor, Active Window Info (Shift-Alt-Tab to freeze display)
+      criticalColorPos := InStr(criticalColor, "0x")
+      StringTrimLeft, criticalColorTrim, criticalColor, criticalColorPos - 1
+      StringSplit, criticalColorParsed, criticalColorTrim, %A_Space%
+      
+      if (criticalColorParsed1 = 0xF0F0F0) {
+        dockBarWidth := dockBarWidthGuess - A_Index ; The width, in pixels, of the right-side dock bar
+        break
+      }
+    }
+    
     break
   }
 }
@@ -126,23 +160,14 @@ cellPaddingY := Round(Mod(((screenHeight - (windowBorder + menuHeight)) / 2) - R
 cellsX := Floor((screenWidth - dockBarWidth - (cellPaddingX * 2)) / cellSize) ; The number of visibile cells to evaluate in the X direction
 cellsY := Floor((screenHeight - (windowBorder + menuHeight) - (cellPaddingY * 2)) / cellSize) ; The number of visibile cells to evaluate in the Y direction
 
-balsamFir = 0xA5ADBC ; The color of a targeted location that identifies a Balsam Fir Tree
-
 healthGood = 0x00C000 ; Health meter color indicator, good
 healthFair = 0x00C0C0 ; Health meter color indicator, fair
 healthPoor = 0x0000C0 ; Health meter color indicator, poor
+pooMeter = 0x7C4A1C ; Poo meter color indicator
+queueMeter = 0xFF0000 ; Queue meter color indicator
 
 ; ------------------------------- Part 3 | Variables manipulated by the macro -------------------------------
-
-color = 0 ; The hexadecimal color under the mouse
 hoverCellX = 0 ; The x position of the cell number that the mouse currently hovering over
 hoverCellY = 0 ; The y position of the cell number that the mouse currently hovering over
-loops = 0 ; The number of times the cell scanning algorthim must loop in order to cover every visible cell
-loopCount = 0 ; A variable to hold the current A_Index value of a parent loop
-breakLoop = 0 ; A variable containing directions to break out a parent loop
-moveUp = 0 ; The amount of tiles going up that the mouse should hover over
-moveLeft = 0 ; The amount of tiles going left that the mouse should hover over
-moveDown = 0 ; The amount of tiles going down that the mouse should hover over
-moveRight = 0 ; The amount of tiles going right that the mouse should hover over
 locationX = 0 ; The x position of a targeted object
 locationY = 0 ; The y position of a targeted object
