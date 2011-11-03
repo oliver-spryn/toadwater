@@ -28,8 +28,20 @@ selectTool(itemName) {
 ; Globalize the scope of the needed variables for use within this function
   global windowBorder, menuHeight, inventorySpacing, inventoryClick
 
-; Select the item
+; Find the item
   itemLoc := findItem(itemName)
+  
+; Just to make sure we don't accidently select an active tool, select another tool before selecting the one we want
+  if (itemLoc < 20) {
+    securityItem := (windowBorder + menuHeight) + (inventorySpacing * (itemLoc + 1))
+    Click %inventoryClick%, %securityItem%
+  } else {
+    securityItem := (windowBorder + menuHeight) + (inventorySpacing * (itemLoc - 1))
+    Click %inventoryClick%, %securityItem%
+  }
+  
+  sleep 750
+  
   inventoryItem := (windowBorder + menuHeight) + (inventorySpacing * itemLoc)
   Click %inventoryClick%, %inventoryItem%
 }
@@ -46,12 +58,20 @@ mouseMove(x, y) {
   MouseMove, cellPaddingX + 10 + ((x - 1) * cellSize), windowBorder + menuHeight + cellPaddingY + 30 + ((y - 1) * cellSize)
 }
 
+; Click a certain x and y cell
+click(x, y) {
+  mouseMove(x, y)
+  Click
+}
+
 ; Get the hexadecimal color under the pointer
 getColor(type = "fast") {
+; Good most any color matching that is needed, such as the colors of the gameplay tiles
   if (type = "fast") {
     MouseGetPos mouseX, mouseY
     PixelGetColor color, %mouseX%, %mouseY%, RGB
     return color
+; This is mainly used whenever evaluating color-coded information on the dockbar
   } else {
     WinGetText, color, Active Window Info (Shift-Alt-Tab to freeze display)
     sleep 75
@@ -83,7 +103,7 @@ is(object) {
 ; Locate the closest x and y position of a given object
 locate(object) {
 ; Globalize the scope of the needed variables for use within this function
-  global cellsX, cellsY, loops, loopCount, hoverCellX, hoverCellY, breakLoop, moveUp, moveRight, moveDown, moveLeft, locationX, locationY
+  global cellsX, cellsY, hoverCellX, hoverCellY, locationX, locationY
 
 ; Recursively look for a the object by scanning from the center, out to locate the closest one
   mouseMove(Ceil(cellsX / 2), Ceil(cellsY / 2))
@@ -230,61 +250,139 @@ locate(object) {
 monitor(bar) {
 ; Globalize the scope of the needed variables for use within this function
   global windowBorder, menuHeight, screenWidth, dockBarWidth, healthGood, healthFair, healthPoor
-
+  
   if (bar = "health") {
-    barY := 575 + windowBorder + menuHeight
     barX := screenWidth - dockBarWidth + 15
+    barY := 570 + windowBorder + menuHeight
     
     MouseMove, %barX%, %barY%
     sleep 1000
     
-    if (getColor() = healthGood) {
+    if (getColor("critical") = healthGood) {
       return "good"
-    } else if (getColor() = healthFair) {
+    } else if (getColor("critical") = healthFair) {
       return "fair"
     } else {
       return "poor"
     }
+  } else if (bar = "poo") {
+    barX := screenWidth - dockBarWidth + 115
+    barY := 595 + windowBorder + menuHeight
+    
+    MouseMove, %barX%, %barY%
+    sleep 1000
+    
+    if (getColor("critical") = pooMeter) {
+      return "poor"
+    } else {
+      return "good"
+    }
+  } else {
+    barX := screenWidth - dockBarWidth + 15
+    barY := 605 + windowBorder + menuHeight
+    
+    MouseMove, %barX%, %barY%
+    sleep 1000
+    
+    if (getColor("critical") = queueMeter) {
+      return "poor"
+    } else {
+      return "good"
+    }
   }
 }
 
-; Find the 
+; Get the locus (overall gameplay coordinates) from the information bar
+getLocus() {
+  WinGetText, locus, Active Window Info (Shift-Alt-Tab to freeze display)
+  sleep 75
+  keywordPos := InStr(locus, "Health:")
+  StringTrimLeft, locusTrim, locus, keywordPos - 1
+  StringSplit, locusParsed, locusTrim, %A_Space%
+  
+  StringSplit, xParsed, locusParsed1, `n
+  xLocus := SubStr(xParsed2, 1, StrLen(xParsed2) - 1)
+  StringUpper, xUpper, locusParsed2
+  
+  yLocus := SubStr(locusParsed4, 1, StrLen(locusParsed4) - 1)
+  StringSplit, yLocus, locusParsed5, `n
+  StringUpper, yUpper, yLocus1
+  
+  return xLocus A_Space xUpper A_Space yLocus A_Space yUpper
+}
 
-; Go one cell away from a targeted location, usually to perform some action on the cell
-goBy(x, y) {
+; Go to a given cell, avoid obsticles, and maintain health
+goTo(x, y) {
 ; Globalize the scope of the needed variables for use within this function
-  global cellsX, cellsY, hoverCellX, hoverCellY
+  global cellsX, cellsY, hoverCellX, hoverCellY, inv1, inv2
+  
+; Select the walking staff
+  selectTool("Toadwater Staff")
   
 ; Calculate the location of the targeted tile, relative to the current position
-  if (x > cellsX) {
-    goX := x - cellsX
-  } else {
-    goX := cellsX - x
-  }
-  MsgBOx % goX
-  if (y - 1 > cellsY) {
-    y := y - 1 - cellsY
-  } else {
-    y := cellsY - y - 1
-  }
-
-; Go in the x direction
-  loop %goX% {
-    if (goX > cellsX) {
-      mouseMove(hoverCellX + 1, hoverCellY)
-      Click
+  cellXDiff := x - Ceil(cellsX / 2)
+  cellYDiff := y - Ceil(cellsY / 2)
+  cellXDist := Abs(cellXDiff)
+  cellYDist := Abs(cellYDiff)
+  health := monitor("health")
+  
+; Change travel in the x direction first...
+  loop %cellXDist% {
+  ; Grab the initial locus
+    locus = getLocus()
+    
+  ; Check the health, are we okay for go?
+    if (monitor("health") = "good" || monitor("health") = "fair") {
+    ; Move right
+      if (cellXDiff > 0) {
+        Send {right}
+    ; Move left
+      } else {
+        Send {left}
+      }
+   ; Nope, health needs attention. Switch between two tools in our inventory, and we will magically build health (Seriously!)
     } else {
-       mouseMove(hoverCellX - 1, hoverCellY)
+      loop {
+        selectTool(inv1)
+        sleep 750
+        selectTool(inv2)
+        sleep 750
+        
+        if (monitor("health") = "good" || monitor("health") = "fair") {
+          break
+        }
+      }
     }
   }
   
-; Go in the y direction
-  loop %x% {
-    if (y > cellsY) {
-      mouseMove(hoverCellX, hoverCellY + 1)
-      Click
+; ... then in the y direction
+  loop %cellYDist% {
+  ; Grab the initial locus
+    locus = getLocus()
+    
+  ; Check the health, are we okay for go?
+    if (monitor("health") = "good" || monitor("health") = "fair") {
+    ; Move down
+      if (cellYDiff > 0) {
+        Send {down}
+    ; Move up
+      } else {
+        Send {up}
+      }
+   ; Nope, health needs attention. Switch between two tools in our inventory, and we will magically build health (Seriously!)
     } else {
-       mouseMove(hoverCellX, hoverCellY - 1)
+      loop {
+        selectTool(inv1)
+        sleep 750
+        selectTool(inv2)
+        sleep 750
+        
+        if (monitor("health") = "good" || monitor("health") = "fair") {
+          break
+        }
+      }
     }
+    
+  ; Did anything block us?
   }
 }
