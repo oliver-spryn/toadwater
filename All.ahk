@@ -1,7 +1,6 @@
 #Include framework\include.ahk
-#d::ExitApp ; This will exit out of the script at any time by Pressing Win+d
-#p::Pause ; Pauses the script
-#f:: ; starts the script
+
+^!f:: ; starts the script
 
 ; you must start with a 7x7 ground free of anything
 ; start in the top left of your area
@@ -15,6 +14,7 @@ selectTool("Toadwater Staff")
 ; -----------------------------------------------------------------------------------------
 ; -----------------------------------------------------------------------------------------
 ; -----------------------------------------------------------------------------------------
+
 loop
 {
     while (itemNum("Class 1 Outhouse Materials") < 13)
@@ -40,6 +40,10 @@ loop
     					      {
     					           Send {Right}
     					           queueEmpty()
+                        while (monitor("health") = "poor")
+                        {
+                           Sleep 3*60*60*1000
+                        }
     					      }
     					}
     					
@@ -49,6 +53,14 @@ loop
     					
     					selectTool("Toadwater Staff")
     					queueEmpty()
+                        while (monitor("health") = "poor")
+                        {
+                           Sleep 3*60*60*1000
+                        }
+    					while (monitor("health") = "poor")
+    					{
+    					   Sleep 3*60*60*1000
+    					}
     				}
     				Send {Down}
     				loop 5
@@ -65,6 +77,10 @@ loop
                               {
                                    Send {Right}
                                    queueEmpty()
+                                   while (monitor("health") = "poor")
+                              {
+                                   Sleep 3*60*60*1000
+                              }
                               }
                         }
                         
@@ -72,6 +88,10 @@ loop
     					Send {Right}
     					selectTool("Toadwater Staff")
     					queueEmpty()
+                        while (monitor("health") = "poor")
+                        {
+                           Sleep 3*60*60*1000
+                        }
     				}
     				Send {Down}
     			}
@@ -80,6 +100,10 @@ loop
     			{
     				Send {Up}
     				queueEmpty()
+                    while (monitor("health") = "poor")
+                    {
+                        Sleep 3*60*60*1000
+                    }
     			}
     		}
     	}
@@ -92,6 +116,10 @@ loop
     		{
     			Send p ; whittles planks
     			queueEmpty()
+                while (monitor("health") = "poor")
+                {
+                     Sleep 3*60*60*1000
+                }
     		} 
     	}
     	selectTool("Balsam Fir Wood")
@@ -101,6 +129,11 @@ loop
     	{
     		Send o ; builds outhouses
     		queueEmpty()
+    		
+           while (monitor("health") = "poor")
+           {
+                 Sleep 3*60*60*1000
+           }
     	}
     }
     
@@ -117,6 +150,10 @@ loop
     {
     	Send {Down}
     	queueEmpty()
+        while (monitor("health") = "poor")
+        {
+             Sleep 3*60*60*1000
+        }
     }
     
     mouseMove(Ceil(cellsX / 2), Ceil(cellsY / 2) - 1) ; checks for eating tree, if not, it plants a tree there.
@@ -134,6 +171,10 @@ loop
     		{
     			Send {Left}
     			queueEmpty()
+                while (monitor("health") = "poor")
+                {
+                     Sleep 3*60*60*1000
+                }
     		}
     		selectTool("Class 1 Outhouse Materials")
     		Send {Left}
@@ -144,17 +185,33 @@ loop
     			{
     				Send e
     				queueEmpty()
+                    while (monitor("health") = "poor")
+                    {
+                       Sleep 3*60*60*1000
+                    }
     			}
     			Send {Left}
     			queueEmpty()
+                while (monitor("health") = "poor")
+                 {
+                   Sleep 3*60*60*1000
+                 }
     			Send {Right}
     			queueEmpty()
+                        while (monitor("health") = "poor")
+                        {
+                           Sleep 3*60*60*1000
+                        }
     		}
     		selectTool("Blister Shovel")
     		loop 50
     		{
     			Send {Left}
     			queueEmpty()
+                while (monitor("health") = "poor")
+                {
+                    Sleep 3*60*60*1000
+                }
     		}
     	}
     }
@@ -185,11 +242,15 @@ loop
     			{
     			     loop 10
     			     {
-    			         IfwinExists, Crop View
+    			         IfWinExist, Crop View
     			         {
     			             ControlClick x%x% y%y%, Crop View
         			         x := x + 55
         			         queueEmpty()
+                        while (monitor("health") = "poor")
+                        {
+                           Sleep 3*60*60*1000
+                        }
     	       		     }
     			     }
     			     x = 30
@@ -197,6 +258,10 @@ loop
     			}    
         			Send {Left}
     	       		queueEmpty()
+                        while (monitor("health") = "poor")
+                        {
+                           Sleep 3*60*60*1000
+                        }
     		    }
         mouseMove(Ceil(cellsX / 2) + 1, Ceil(cellsY / 2))
     		    
@@ -207,17 +272,29 @@ loop
     		{
     			Send {Right}
     			queueEmpty()
+                        while (monitor("health") = "poor")
+                        {
+                           Sleep 3*60*60*1000
+                        }
     		}
     		selectTool("Radish Seed")
     		Send {Right}
     		selectTool("Toadwater Staff")
     		queueEmpty()
+                        while (monitor("health") = "poor")
+                        {
+                           Sleep 3*60*60*1000
+                        }
     	}
     	Send {Right}
     }
     
     Send {Left} {Up}
     queueEmpty()
+                        while (monitor("health") = "poor")
+                        {
+                           Sleep 3*60*60*1000
+                        }
     
     loop 5
     {
@@ -230,40 +307,55 @@ loop
                 meY = Ceil(cellsY / 2)
                 
                 click(meX, meY) ; clicks position of avatar
-    			<Radish Collect>
+    			x = 30
+                y = 45
+                loop 10
+                {
+                     loop 10
+                     {
+                         IfWinExist, Crop View
+                         {
+                             ControlClick x%x% y%y%, Crop View
+                             x := x + 55
+                             queueEmpty()
+                        while (monitor("health") = "poor")
+                        {
+                           Sleep 3*60*60*1000
+                        }
+                         }
+                     }
+                     x = 30
+                     y = y + 45
+                } 
     			Send {Left}
-    			{Status Check}
+    			queueEmpty()
+                        while (monitor("health") = "poor")
+                        {
+                           Sleep 3*60*60*1000
+                        }
     		}
         
         mouseMove(Ceil(cellsX / 2) + 1, Ceil(cellsY / 2))
     		
     	if (is(ground)) ; sees if ground to right is blank and if not run check for fully grown radish
     	{
-    		<Select Dried Poo>
+    		selectTool("Dried Poo")
     		loop 10
     		{
     			Send {Right}
     			queueEmpty()
+                        while (monitor("health") = "poor")
+                        {
+                           Sleep 3*60*60*1000
+                        }
     		}
-    		    x = 30
-                y = 45
-                loop 10
-                {
-                     loop 10
-                     {
-                         IfwinExists, Crop View
-                         {
-                             ControlClick x%x% y%y%, Crop View
-                             x := x + 55
-                             queueEmpty()
-                         }
-                     }
-                     x = 30
-                     y = y + 45
-                } 
     		Send {Right}
     		selectTool("Toadwater Staff")
     		queueEmpty()
+                        while (monitor("health") = "poor")
+                        {
+                           Sleep 3*60*60*1000
+                        }
     	}
     	Send {Up}
     }
@@ -272,5 +364,9 @@ loop
     {
     	Send {Left}
     	queueEmpty()
+                        while (monitor("health") = "poor")
+                        {
+                           Sleep 3*60*60*1000
+                        }
     }
 }
