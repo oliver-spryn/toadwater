@@ -382,7 +382,5 @@ goTo(x, y) {
         }
       }
     }
-    
-  ; Did anything block us?
   }
 }
