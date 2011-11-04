@@ -160,11 +160,11 @@ cellPaddingY := Round(Mod(((screenHeight - (windowBorder + menuHeight)) / 2) - R
 cellsX := Floor((screenWidth - dockBarWidth - (cellPaddingX * 2)) / cellSize) ; The number of visibile cells to evaluate in the X direction
 cellsY := Floor((screenHeight - (windowBorder + menuHeight) - (cellPaddingY * 2)) / cellSize) ; The number of visibile cells to evaluate in the Y direction
 
-healthGood = 0x00C000 ; Health meter color indicator, good
-healthFair = 0x00C0C0 ; Health meter color indicator, fair
+healthGood = 0x60CCF0 ; Health meter color indicator, good
+healthFair = 0xE0D9CC ; Health meter color indicator, fair
 healthPoor = 0x0000C0 ; Health meter color indicator, poor
 pooMeter = 0x7C4A1C ; Poo meter color indicator
-queueMeter = 0xFF0000 ; Queue meter color indicator
+queueMeter = 0x0000FF ; Queue meter color indicator
 
 ; ------------------------------- Part 3 | Variables manipulated by the macro -------------------------------
 hoverCellX = 0 ; The x position of the cell number that the mouse currently hovering over
