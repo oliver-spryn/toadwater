@@ -34,7 +34,7 @@ selectTool(itemName) {
   itemLoc := findItem(itemName)
   
 ; Just to make sure we don't accidently select an active tool, select another tool before selecting the one we want
-  if (itemLoc < 20) {
+  if (itemLoc = 1) {
     securityItem := (windowBorder + menuHeight) + (inventorySpacing * (itemLoc + 1))
     Click %inventoryClick%, %securityItem%
   } else {
@@ -275,18 +275,26 @@ locate(object) {
 ; Monitor the progress bars
 monitor(bar) {
 ; Globalize the scope of the needed variables for use within this function
-  global windowBorder, menuHeight, screenWidth, dockBarWidth, healthGood, healthFair, healthPoor
+  global windowBorder, menuHeight, screenWidth, dockBarWidth, healthGood, healthFair, healthPoor, pooMeter, queueMeter
   
   if (bar = "health") {
-    barX := screenWidth - dockBarWidth + 15
-    barY := 570 + windowBorder + menuHeight
+    WinGetText, health, Active Window Info (Shift-Alt-Tab to freeze display)
+    sleep 75
+    StringSplit, healthSplit, health, /
+    StringSplit, healthParsed, healthSplit, `n
     
-    MouseMove, %barX%, %barY%
-    sleep 1000
+    loop {
+      if (healthParsed%A_Index% = "") {
+        lastOne := A_Index - 1
+        barInfo := healthParsed%lastOne%
+        break
+      }
+    }
+    MsgBox % healthParsed1
     
-    if (getColor("critical") = healthGood) {
+    if (barColor = healthGood) {
       return "good"
-    } else if (getColor("critical") = healthFair) {
+    } else if (barColor = healthFair) {
       return "fair"
     } else {
       return "poor"
@@ -294,23 +302,25 @@ monitor(bar) {
   } else if (bar = "poo") {
     barX := screenWidth - dockBarWidth + 115
     barY := 595 + windowBorder + menuHeight
+    barColor := getColor("critical")
     
     MouseMove, %barX%, %barY%
     sleep 1000
     
-    if (getColor("critical") = pooMeter) {
+    if (barColor = pooMeter) {
       return "poor"
     } else {
       return "good"
     }
   } else {
-    barX := screenWidth - dockBarWidth + 15
+    barX := screenWidth - dockBarWidth + 5
     barY := 605 + windowBorder + menuHeight
+    barColor := getColor("critical")
     
     MouseMove, %barX%, %barY%
     sleep 1000
     
-    if (getColor("critical") = queueMeter) {
+    if (barColor = queueMeter) {
       return "poor"
     } else {
       return "good"
@@ -360,13 +370,9 @@ goTo(x, y) {
   cellYDiff := y - Ceil(cellsY / 2)
   cellXDist := Abs(cellXDiff)
   cellYDist := Abs(cellYDiff)
-  health := monitor("health")
   
 ; Change travel in the x direction first...
   loop %cellXDist% {
-  ; Grab the initial locus
-    locus = getLocus()
-    
   ; Check the health, are we okay for go?
     if (monitor("health") = "good" || monitor("health") = "fair") {
     ; Move right
@@ -380,9 +386,9 @@ goTo(x, y) {
     } else {
       loop {
         selectTool(inv1)
-        sleep 750
+        sleep 1500
         selectTool(inv2)
-        sleep 750
+        sleep 1500
         
         if (monitor("health") = "good" || monitor("health") = "fair") {
           break
@@ -393,9 +399,6 @@ goTo(x, y) {
   
 ; ... then in the y direction
   loop %cellYDist% {
-  ; Grab the initial locus
-    locus = getLocus()
-    
   ; Check the health, are we okay for go?
     if (monitor("health") = "good" || monitor("health") = "fair") {
     ; Move down
@@ -409,9 +412,9 @@ goTo(x, y) {
     } else {
       loop {
         selectTool(inv1)
-        sleep 750
+        sleep 1500
         selectTool(inv2)
-        sleep 750
+        sleep 1500
         
         if (monitor("health") = "good" || monitor("health") = "fair") {
           break
