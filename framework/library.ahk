@@ -21,6 +21,8 @@ findItem(itemName) {
       break
     }
   }
+  
+  return 0
 }
 
 ; Select a particular item from the inventory list
@@ -44,6 +46,29 @@ selectTool(itemName) {
   
   inventoryItem := (windowBorder + menuHeight) + (inventorySpacing * itemLoc)
   Click %inventoryClick%, %inventoryItem%
+}
+
+; Find the mumber of items that we have for a particular inventory item
+itemNum(object) {
+; Globalize the scope of the needed variables for use within this function
+  global inv1, inv2, inv3, inv4, inv5, inv6, inv7, inv8, inv9, inv10, inv11, inv12, inv13, inv14, inv15, inv16, inv17, inv18, inv19, inv20
+ 
+; Is the object even in the inventory?
+  itemLoc := findItem(object)
+
+  if (itemLoc != 0) {
+  ; Grab the text from Window Spy
+    WinGetText, inventory, Active Window Info (Shift-Alt-Tab to freeze display)
+    sleep 75
+    keywordPos := InStr(inventory, "Hoard")
+    StringTrimLeft, inventoryTrim, inventory, keywordPos - 1
+    StringSplit, parsedInventory, inventoryTrim, `n
+    
+    parserItem := itemLoc + 1
+    MsgBox % parsedInventory%parserItem%
+  } else {
+    return 0
+  }
 }
 
 ; Move the mouse to a particular x and y cell
