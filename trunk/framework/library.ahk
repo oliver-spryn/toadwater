@@ -65,7 +65,8 @@ itemNum(object) {
     StringSplit, parsedInventory, inventoryTrim, `n
     
     parserItem := itemLoc + 1
-    MsgBox % parsedInventory%parserItem%
+    parserReturn = parsedInventory%parserItem%
+    return parserReturn
   } else {
     return 0
   }
@@ -215,7 +216,7 @@ locate(object) {
   ; Moving down
     moveDown := 2 * loopCount
     
-    loop %moveDown% {
+    loop %moveDown% {   
     ; Don't go off the gameplay area
       if (hoverCellY + 1 <= cellsY) {
         mouseMove(hoverCellX, hoverCellY + 1)
@@ -313,6 +314,16 @@ monitor(bar) {
       return "poor"
     } else {
       return "good"
+    }
+  }
+}
+
+; Wait until the queue is empty
+queueEmpty() {
+  loop {
+    if (monitor("queue") = "good") {
+      return true
+      break
     }
   }
 }
