@@ -19,19 +19,18 @@ loop
 {
     loop
     {
-        if (itemNum("Class 1 Outhouse Materials") > 13) {
+        if (itemNum("Class 1 Outhouse Materials") > 13)
+	{
           break
         }
-        
-        
-        
-    	if (13 - itemNum("Class 1 Outhouse Materials") < itemNum("Grade 1 Plank"))
+       	if (13 - itemNum("Class 1 Outhouse Materials") < itemNum("Grade 1 Plank"))
     	{
     		loop
     		{
-    		      if (itemNum("Balsam Fir Wood") >= 13 - itemNum("Grade 1 Plank")) {
-    		        break
-    		      }
+			if (itemNum("Balsam Fir Wood") >= 13 - itemNum("Grade 1 Plank"))
+			{
+	    		      break
+    		        }
     		
     			Send {Right}
     			loop 3
