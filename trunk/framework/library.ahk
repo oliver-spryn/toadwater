@@ -34,10 +34,23 @@ selectTool(itemName) {
   if (itemLoc = 1) {
     Send 2
     Send 1
-  } else {
-    securityItem := itemLoc - 1
-    Send %securityItem%
+  } else if (itemLoc < 10) {
+    Send 1
     Send %itemLoc%
+  } else if (itemLoc = 10) {
+    Send 1
+    Send 0
+  } else if (itemLoc < 20) {
+    Send 1
+    itemInv := itemLoc - 10
+    Send {Shift Down}
+    Send %itemLoc%
+    Send {Shift Up}
+  } else {
+    Send 1
+    Send {Shift Down}
+    Send 0
+    Send {Shift Up}
   }
 
 ; ----------- Here for good measure, but a simple keystroke replaces the need for a mouse click -----------
