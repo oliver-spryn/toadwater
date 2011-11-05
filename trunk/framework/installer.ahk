@@ -128,7 +128,7 @@ review(action) {
         textY := 120 + ((A_Index - 16) * 20)
       }
       
-      Gui, Add, Text, x%textX% y%textY%, 
+      Gui, Add, Text, x%textX% y%textY% w240, 
     }
   } else if (action = "hide") {  
     GuiControl, hide, Static26
@@ -148,7 +148,7 @@ review(action) {
     GuiControl, show, Static26
     GuiControl, show, Static27
     GuiControl, show, Static28
-    GuiControl, move, Static28, w150 ; And we need to re-adjust the width! Why???
+    GuiControl, move, Static28, w240 ; And we need to re-adjust the width! Why???
     GuiControl,, Static28, %windowName%
     GuiControl, show, Static29
     
@@ -161,7 +161,7 @@ review(action) {
       
       if (inv%A_Index% != "") {
         value := inv%A_Index%
-        GuiControl, move, Static%static%, w150 ; And we need to re-adjust the width! Why???
+        GuiControl, move, Static%static%, w240 ; And we need to re-adjust the width! Why???
         GuiControl,, Static%static%, %A_Index%. %value%
       } else {
         GuiControl,, Static%static%, 
@@ -399,14 +399,5 @@ if (!FileExist(configFile)) {
   ButtonFinish:
   ; Close the setup wizard
     Gui, Destroy
-    
-  ; Send an odd keystroke (one the user would never think to press), to continue executing the code
-    Send ^!j
   return
-} else {
-; Send an odd keystroke (one the user would never think to press), to continue executing the code
-  Send ^!j
 }
-
-; Continue with the script...
-^!j::

@@ -27,25 +27,39 @@ findItem(itemName) {
 
 ; Select a particular item from the inventory list
 selectTool(itemName) {
-; Globalize the scope of the needed variables for use within this function
-  global windowBorder, menuHeight, inventorySpacing, inventoryClick
-
 ; Find the item
   itemLoc := findItem(itemName)
-  
+
 ; Just to make sure we don't accidently select an active tool, select another tool before selecting the one we want
   if (itemLoc = 1) {
-    securityItem := (windowBorder + menuHeight) + (inventorySpacing * (itemLoc + 1))
-    Click %inventoryClick%, %securityItem%
+    Send 2
+    Send 1
   } else {
-    securityItem := (windowBorder + menuHeight) + (inventorySpacing * (itemLoc - 1))
-    Click %inventoryClick%, %securityItem%
+    securityItem := itemLoc - 1
+    Send %securityItem%
+    Send %itemLoc%
   }
-  
-  sleep 750
-  
-  inventoryItem := (windowBorder + menuHeight) + (inventorySpacing * itemLoc)
-  Click %inventoryClick%, %inventoryItem%
+
+; ----------- Here for good measure, but a simple keystroke replaces the need for a mouse click -----------
+; Globalize the scope of the needed variables for use within this function
+; global windowBorder, menuHeight, inventorySpacing, inventoryClick
+;
+; Find the item
+; itemLoc := findItem(itemName)
+;
+; Just to make sure we don't accidently select an active tool, select another tool before selecting the one we want
+; if (itemLoc = 1) {
+;   securityItem := (windowBorder + menuHeight) + (inventorySpacing * (itemLoc + 1))
+;   Click %inventoryClick%, %securityItem%
+; } else {
+;   securityItem := (windowBorder + menuHeight) + (inventorySpacing * (itemLoc - 1))
+;   Click %inventoryClick%, %securityItem%
+; }
+; 
+; sleep 750
+; 
+; inventoryItem := (windowBorder + menuHeight) + (inventorySpacing * itemLoc)
+; Click %inventoryClick%, %inventoryItem%
 }
 
 ; Find the mumber of items that we have for a particular inventory item
@@ -88,6 +102,17 @@ mouseMove(x, y) {
 click(x, y) {
   mouseMove(x, y)
   Click
+}
+
+; Focus the PixelGetColor to a particular X and Y cell
+cellColor(x, y) {
+; Globalize the scope of the needed variables for use within this function
+  global cellPaddingX, cellSize, windowBorder, menuHeight, cellPaddingY
+  
+; The +10 or +30 are for good measure, just be sure it is not clicking off the tile in the x or y directions
+  PixelGetColor, pixelColor, cellPaddingX + 10 + ((x - 1) * cellSize), windowBorder + menuHeight + cellPaddingY + 30 + ((y - 1) * cellSize)
+  
+  return pixelColor
 }
 
 ; Get the hexadecimal color under the pointer
@@ -280,7 +305,7 @@ monitor(bar) {
   if (bar = "health") {
     WinGetText, health, Active Window Info (Shift-Alt-Tab to freeze display)
     sleep 75
-    StringSplit, healthSplit, health, /
+    StringSplit, healthSplit, health, %A_Space%/%A_Space%
     StringSplit, healthParsed, healthSplit, `n
     
     loop {
