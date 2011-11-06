@@ -12,6 +12,10 @@
 ; check for Rseed------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ; check for ect.------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+numGold = 0
+MsgBox An input box will pop up after you press okay: Please enter the quantity of gold you have using only numbers and (if necessary) a decimal point. (Don't use other punctuations or letters or other misc. characters)
+InputBox, numGold
+
 selectTool("Toadwater Staff")
 Send {Right}
 ; -----------------------------------------------------------------------------------------
@@ -137,11 +141,12 @@ loop
     ; we should have a check for the left square to make sure its empty and ready to be "dug on"-------------------------------------------------------------------------------------
     loop 
     {
-        if (itemNum("Dried Poo") >= 1200) {
-          break
+        if (itemNum("Dried Poo") >= 1101) ; this will save at least on spot for dried poo in the inventory
+	{
+          	break
         }
     
-        outhouses := itemNum("Class 1 Outhouse Materials") - 1
+        outhouses := itemNum("Class 1 Outhouse Materials") - 1 ; this makes sure that atleast one outhouse is least in the inv to save its spot
         
     	loop %outhouses%
     	{
@@ -195,27 +200,33 @@ loop
     		meY = Ceil(cellsY / 2)
     			
     		click(meX, meY) ; clicks position of avatar
-    		x = 30
-                y = 45
-    		loop 10
-    		{
-    		     loop 10
-    		     {
-    		         IfWinExist, Crop View
-    		         {
-    		             ControlClick x%x% y%y%, Crop View
-        		     x := x + 55
-        		     queueEmpty()
-    	       	     	 }
-			 ; IfWinExists isn't true, pause program, and output a msgbox telling user of the error---------------------------------------------------------------------------------------
-    		     }
+    		IfWinExist, Crop View
+		{
+			x = 30
+        	        y = 45
+    			loop 10
+    			{
+    			     	loop 10
+    			     	{	         
+    		        		ControlClick x%x% y%y%, Crop View
+        		     		x := x + 55
+        		     		queueEmpty()
+    	       	     	 	}
+			
+    		     	}
     			x = 30
                 	y := y + 55
-    		}    
+    		}
+		IfWinNotExist, Crop View
+		{
+			MsgBox Something went wrong and your cropview window isn't the do
+			Pause, On
+		}    
         	Send {Left}
     		queueEmpty()
     	}
-        mouseMove(Ceil(cellsX / 2) + 1, Ceil(cellsY / 2))
+        
+	mouseMove(Ceil(cellsX / 2) + 1, Ceil(cellsY / 2))
     		    
     	if (is(ground)) ; sees if ground to right is blank and if not run check for fully grown radish
     	{
@@ -225,8 +236,18 @@ loop
     			Send {Right}
     			queueEmpty()
     		}
-		; if code that will check gold and buy radishes if funds are available, else pause program and msgbog error to user -------------------------------------------------------------------
-		; buying radish seeds code -------------------------------------------------------------------------------------------------------------------------
+		if (numGold < 100)
+		{
+			MsgBox You don't have enough gold to buy any radish seeds. Please sell unnesccesary inventory items and unpause the script.
+			Pause, On
+		}
+		Send {Ctrl Down} b {Ctrl Up}
+		queueEmpty()
+		Click 269, 107
+		Sleep 3000
+		Send 100
+		Send {Enter} {Enter}
+		queueEmpty()
     		selectTool("Radish Seed")
     		Send {Right}
     		selectTool("Toadwater Staff")
@@ -246,26 +267,36 @@ loop
     	{
     		Send {Right}
     		meX = Ceil(cellsX / 2)
-                meY = Ceil(cellsY / 2)
-                
-                click(meX, meY) ; clicks position of avatar
-    		loop 20
-    		{
-    			loop 5
+    		meY = Ceil(cellsY / 2)
+    			
+    		click(meX, meY) ; clicks position of avatar
+    		IfWinExist, Crop View
+		{
+			x = 30
+        	        y = 45
+    			loop 10
     			{
-    				Send e
-    				queueEmpty()
-    			}
-    			Send {Left}
-    			queueEmpty()
-    			Send {Right}
-    			queueEmpty()
+    			     	loop 10
+    			     	{	         
+    		        		ControlClick x%x% y%y%, Crop View
+        		     		x := x + 55
+        		     		queueEmpty()
+    	       	     	 	}
+			
+    		     	}
+    			x = 30
+                	y := y + 55
     		}
-    		Send {Left}
+		IfWinNotExist, Crop View
+		{
+			MsgBox Something went wrong and your cropview window isn't the do
+			Pause, On
+		}    
+        	Send {Left}
     		queueEmpty()
-    	}
+    	}        
         
-        mouseMove(Ceil(cellsX / 2) + 1, Ceil(cellsY / 2))
+	mouseMove(Ceil(cellsX / 2) + 1, Ceil(cellsY / 2))
     		
     	if (is(ground)) ; sees if ground to right is blank and if not run check for fully grown radish
     	{
@@ -275,22 +306,19 @@ loop
     			Send {Right}
     			queueEmpty()
     		}
-    	        x = 30
-                y = 45
-                loop 10
-                {
-                     loop 10
-                     {
-                         IfWinExist, Crop View
-                         {
-                             ControlClick x%x% y%y%, Crop View
-                             x := x + 55
-                             queueEmpty()
-                         }
-                     }
-                     x = 30
-                     y := y + 55
-                } 
+		if (numGold < 100)
+		{
+			MsgBox You don't have enough gold to buy any radish seeds. Please sell unnesccesary inventory items and unpause the script.
+			Pause, On
+		}
+		Send {Ctrl Down} b {Ctrl Up}
+		queueEmpty()
+		Click 269, 107
+		Sleep 3000
+		Send 100
+		Send {Enter} {Enter}
+		queueEmpty()
+    		selectTool("Radish Seed")
     		Send {Right}
     		selectTool("Toadwater Staff")
     		queueEmpty()
