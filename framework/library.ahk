@@ -41,8 +41,9 @@ selectTool(itemName) {
     Send 1
     Send 0
   } else if (itemLoc < 20) {
-    Send 1
     itemInv := itemLoc - 10
+    
+    Send 1
     Send {Shift Down}
     Send %itemLoc%
     Send {Shift Up}
@@ -92,7 +93,7 @@ itemNum(object) {
     StringSplit, parsedInventory, inventoryTrim, `n
     
     parserItem := itemLoc + 1
-    parserReturn = parsedInventory%parserItem%
+    parserReturn := parsedInventory%parserItem%
     return parserReturn
   } else {
     return 0
@@ -117,6 +118,17 @@ click(x, y) {
   Click
 }
 
+; Get the hexadecimal color under the pointer
+getColor() {
+; This is mainly used whenever evaluating color-coded information on the dockbar
+  WinGetText, color, Active Window Info (Shift-Alt-Tab to freeze display)
+  sleep 75
+  colorPos := InStr(color, "0x")
+  StringTrimLeft, colorTrim, color, colorPos - 1
+  StringSplit, colorParsed, colorTrim, %A_Space%
+  return colorParsed1
+}
+
 ; Focus the PixelGetColor to a particular X and Y cell
 cellColor(x, y) {
 ; Globalize the scope of the needed variables for use within this function
@@ -128,33 +140,16 @@ cellColor(x, y) {
   return pixelColor
 }
 
-; Get the hexadecimal color under the pointer
-getColor(type = "fast") {
-; Good most any color matching that is needed, such as the colors of the gameplay tiles
-  if (type = "fast") {
-    MouseGetPos mouseX, mouseY
-    PixelGetColor color, %mouseX%, %mouseY%, RGB
-    return color
-; This is mainly used whenever evaluating color-coded information on the dockbar
-  } else {
-    WinGetText, color, Active Window Info (Shift-Alt-Tab to freeze display)
-    sleep 75
-    colorPos := InStr(color, "0x")
-    StringTrimLeft, colorTrim, color, colorPos - 1
-    StringSplit, colorParsed, colorTrim, %A_Space%
-    return colorParsed1
-  }
-}
-
 ; Get the color code for a corresponding cell
 getColorCode(x, y) {
-  MouseMove(x, y)
+  cellColor(x, y)
   sleep 1000
   MsgBox % getColor()
 }
 
 ; Check and see if the current cell contains a specific object
-is(object) {
+is(object, x, y) {
+  mouseMove(x, y)
   sleep 100
   
   if (getColor() = object) {

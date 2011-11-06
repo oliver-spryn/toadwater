@@ -9,8 +9,24 @@
 ; Configuration
 ; -------------------------------
 wizardStep = 1 ; A tracking variable to hold which step of the setup wizard the user is currently on
-configFolder = %A_MyDocuments%\Toadwater Accelerator ; The folder location of the Accelerator's configuration file
+toadwaterInstall = %A_ProgramFiles%\Toadwater ; The path of the Toadwater installation
+configFolder = %toadwaterInstall%\Toadwater Accelerator ; The folder location of the Accelerator's configuration file
 configFile = %configFolder%\config.txt ; The location of the Accelerator's configuration file
+
+; -------------------------------
+; Pre-install setup
+; -------------------------------
+
+; Ensure that this program is being run as the administrator
+if (!A_IsAdmin) {
+  MsgBox, 4, Macro access confirmation, The Toadwater Accelerator macro needs to be run with administrator privileges.`n`nDo you wish to allow this macro to have administrator privileges?
+  
+; Restart with admin privileges
+  IfMsgBox Yes
+    Run *RunAs %A_ScriptFullPath%
+  
+  ExitApp
+}
 
 ; -------------------------------
 ; Function library
@@ -18,7 +34,7 @@ configFile = %configFolder%\config.txt ; The location of the Accelerator's confi
 
 ; Create and manipulate the welcome page
 welcome(action) {
-  mainText = Welcome to the Toadwater Accelerator Setup Wizard!`n`nThese series of steps will guide you through the process of configuring this marco for your system.`nThrough out this short, three minute process, you will:`n`n - Supply your Toadwater username`n - Enter your current list of inventory items`n - Arrange the Toadwater workspace for optimal usage
+  mainText = Welcome to the Toadwater Accelerator Setup Wizard!`n`nThese series of steps will guide you through the process of configuring this marco for your system.`nThrough out this short process, you will:`n`n - Supply your Toadwater username`n - Enter your current list of inventory items`n - Prepare Toadwater for optimal usage`n - Authorize the replacement default images
   secondaryText = Click "Next" to continue.
   
   if (action = "create") {
@@ -172,7 +188,7 @@ review(action) {
 
 ; Create and manipulate the Toadwater layout instructions page
 layout(action) {
-  mainText = Please open your Toadwater client, and follow the directions below:`n`n  [1] Enter your username and password in the Toadwater login window, and tick the "Remember Password"`n       checkbox.`n`n  [2] Close all sub-windows and docks inside of Toadwater, such as construction, textile, etc...`n`n  [3] Open the "Inventory" window by going to View > Inventory, and dock it in the top right corner of the`n       Toadwater window.`n`n  [4] Open the "Info Center" window by going to View > Info Center, and dock it in right below the docked`n       "Inventory" window.
+  mainText = Please open your Toadwater client, and follow the directions below:`n`n  [1] Enter your username and password in the Toadwater login window, and tick the "Remember Password"`n       checkbox.`n`n  [2] Close all sub-windows and docks inside of Toadwater, such as construction, textile, etc...`n`n  [3] Open the "Inventory" window by going to View > Inventory, and dock it in the top right corner of the`n       Toadwater window.`n`n  [4] Open the "Info Center" window by going to View > Info Center, and dock it in right below the docked`n       "Inventory" window.`n`n  [5] Adjust the game's color settings by going to Game > Options, and tick the "Always show color tiles"`n       checkbox.
   
   if (action = "create") {
     Gui, Add, Text, x10 y60, %mainText% ; ClassNN = "Static50" according to Window Spy
@@ -183,11 +199,11 @@ layout(action) {
   }
 }
 
-; Create and manipulate the finish page
-finish(action) {
-  global configFile
-
-  mainText = The Toadwater Accelerator now has enough information about your system to play this game automatically.`nYou will not be required to run through this setup again, as your configuration has been saved to:`n%configFile%`n`nClick "Finish" below, and the Accelerator will close your existing Toadwater window, log in again as you,`nand being gameplay.
+; Authorization to download replacement images page
+authorize(action) {
+  global toadwaterInstall
+  
+  mainText = In order for the Toadwater Accelerator to better locate key objects on your screen, the installer will replace`nthe default icons for several Toadwater objects with ones the macro will better recognize.`nThese objects include:`n`n    - Balsam Fir Tree`n    - Radish Crop Growth from 0 - 100 percent`n    - Ground Fertilization from 0 - 100 percent`n    - The Outhouse`n    - The Ground`n`n`n`n`n`n`n`n`n`n`n`n`nClick "Next" to authorize this action.
   
   if (action = "create") {
     Gui, Add, Text, x10 y60, %mainText% ; ClassNN = "Static51" according to Window Spy
@@ -195,6 +211,21 @@ finish(action) {
     GuiControl, hide, Static51
   } else {
     GuiControl, show, Static51
+  }
+}
+
+; Create and manipulate the finish page
+finish(action) {
+  global configFile
+
+  mainText = The Toadwater Accelerator now has enough information about your system to play this game automatically.`nYou will not be required to run through this setup again, as your configuration has been saved to:`n%configFile%`n`nClick "Finish" below, and the Accelerator will close your existing Toadwater window, log in again as you,`nand being gameplay.
+  
+  if (action = "create") {
+    Gui, Add, Text, x10 y60, %mainText% ; ClassNN = "Static52" according to Window Spy
+  } else if (action = "hide") {
+    GuiControl, hide, Static52
+  } else {
+    GuiControl, show, Static52
   }
 }
 
@@ -238,6 +269,10 @@ if (!FileExist(configFile)) {
 ; Create and hide the Toadwater layout instructions page
   layout("create")
   layout("hide")
+  
+; Create the authorization page
+  authorize("create")
+  authorize("hide")
   
 ; Create the finish page
   finish("create")
@@ -312,6 +347,24 @@ if (!FileExist(configFile)) {
     ; Hide the layout page
       layout("hide")
       
+    ; Show the authorize page
+      authorize("show")
+    
+    ; Increment the wizard step counter
+      wizardStep++
+  ; Actions if this is step 6
+    } else if (wizardStep = 6) {
+    ; Disable the Next/Back buttons
+      GuiControl, disabled, Button1
+      GuiControl, disabled, Button2
+      
+    ; Transfer the images
+      FileRemoveDir, %toadwaterInstall%\Images, 1
+      FileCopyDir, images, %toadwaterInstall%\Images, 1
+      
+    ; Hide the authorize page
+      authorize("hide")
+      
     ; Show the finish page
       finish("show")
       
@@ -385,12 +438,23 @@ if (!FileExist(configFile)) {
       
     ; Decrement the wizard step counter
       wizardStep--
+  ; Actions if this is step 6
+    } else if (wizardStep = 6) {
+    ; Hide the authorize page
+      authorize("hide")
+      
+    ; Show the layout page
+      layout("show")
+      
+    ; Decrement the wizard step counter
+      wizardStep--
     }
   return
   
 ; Actions to perform when the "Cancel" button is clicked
   ButtonCancel:
    MsgBox, 4, Exit Setup?, Are you sure you wish to exit the setup?
+   
    IfMsgBox Yes
      ExitApp
   return
@@ -399,5 +463,14 @@ if (!FileExist(configFile)) {
   ButtonFinish:
   ; Close the setup wizard
     Gui, Destroy
+    
+  ; Send an odd keystroke (one the user would never think to press), to continue executing the code
+    Send ^!j
   return
+} else {
+; Send an odd keystroke (one the user would never think to press), to continue executing the code
+  Send ^!j
 }
+
+; Continue with the script...
+^!j::

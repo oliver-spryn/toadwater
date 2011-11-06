@@ -6,6 +6,60 @@
 ; Created by: Oliver Spryn
 
 ; -------------------------------
+; Function library
+; -------------------------------
+
+dockBarWidth() {
+; Get the resolution of the window
+  SysGet, windowBorder, 31 ; The height, in pixels, of the window border enclosing the Toadwater application
+  Sysget, menuHeight, 15 ; The height, in pixels, of the Toadwater application menu
+  SysGet, workableArea, MonitorWorkArea ; The area, in pixels, that a window may consume (screen height - task bar height)
+  screenWidth := workableAreaRight ; The width of the screen that a window may consume, in pixels
+  screenHeight := workableAreaBottom ; The height of the screen that a window may consume, in pixels 
+  
+; Scan recursively for the left end (a.k.a the width) of the dock bar
+  MouseMove, screenWidth, screenHeight - 10
+  sleep 1000
+  
+  loop {
+  ; Move the mouse to the appropriate location
+    MouseMove, screenWidth - A_Index, screenHeight - 10
+  
+  ; Parse the color from Window Spy
+    WinGetText, color, Active Window Info (Shift-Alt-Tab to freeze display)
+    colorPos := InStr(color, "0x")
+    StringTrimLeft, colorTrim, color, colorPos - 1
+    StringSplit, colorParsed, colorTrim, %A_Space%
+    
+    if (colorParsed1 != 0xF0F0F0) {
+      dockBarWidthGuess := A_Index ; A closeish guess of the width, in pixels, of the right-side dock bar
+    
+    ; Odds are, we went too fast and lost some precision... so do some fine tuning
+      loop {
+      ; Move the mouse to the appropriate location
+        MouseGetPos mouseX, mouseY
+        MouseMove, mouseX + 1, screenHeight - 10
+        sleep 750
+        
+      ; Parse the color from Window Spy
+        WinGetText, criticalColor, Active Window Info (Shift-Alt-Tab to freeze display)
+        criticalColorPos := InStr(criticalColor, "0x")
+        StringTrimLeft, criticalColorTrim, criticalColor, criticalColorPos - 1
+        StringSplit, criticalColorParsed, criticalColorTrim, %A_Space%
+        
+        if (criticalColorParsed1 = 0xF0F0F0) {
+          dockBarWidth := dockBarWidthGuess - A_Index ; The width, in pixels, of the right-side dock bar
+          return dockBarWidth
+          break
+        }
+      }
+      
+      break
+    }
+  }
+}
+
+; -------------------------------
 ; Pre-gamplay setup
 ; -------------------------------
 
@@ -39,17 +93,22 @@ if (FileExist(configFile)) {
 ; -------------------------------
 
 ; Create a waiting window
-Gui, +AlwaysOnTop -SysMenu
-Gui, Color, White
-Gui, Add, Text, x0 y40 w300 Center cBlack, Logging you in... ; ClassNN = "Static1" according to Window Spy
-Gui, Show, w300 h100 Center, Start up
+Gui, +AlwaysOnTop -SysMenu ; Create the dialog, and hide the minimize, maximize, and close buttons, and keep it on top
+Gui, Color, White ; Set the background color to white
+Gui, Add, Text, x10 y10 w300, Start up progress:`n`n    [*] Starting dependant programs`n    [ ] Logging you in`n    [ ] Gathering system information`n    [ ] Calibrating macro ; ClassNN = "Static1" according to Window Spy
+Gui, Show, xCenter y100 w300 h100 Center, Start up
+
+Gui, Add, Progress, w300 h50 x0 y100 ; Add a progess bar to the bottom of the page. This will be used as a backdrop for the important message.
+Gui, Add, Text, x40 y115 BackgroundTrans, Do not move your mouse during this process ; ClassNN = "Static2" according to Window Spy
 
 ; The actual title of the Toadwater window
 parsedName = TWC (%windowName%)
 
 ; Close any existing Toadwater windows, then open, focus on, and maximize on a new Toadwater window
+RunAs  ; Run as the normal user, in case we are just leavinig the administrator-level installer
+
 if (WinExist(parsedName)) {
-  WinClose TWC (%windowName%)
+  WinClose %parsedName%
   sleep 1000
   Run %A_ProgramFiles%\Toadwater\TWC.exe
 } else if (WinExist("TWC")) {
@@ -75,6 +134,10 @@ WinActivate, TWC
 WinClose, Login
 WinMaximize, TWC
 
+; Modify the waiting window
+GuiControl, hide, Static1
+Gui, Add, Text, x10 y10 w300, Start up progress:`n`n    [X] Starting dependant programs`n    [*] Logging into Toadwater`n    [ ] Gathering system information`n    [ ] Calibrating macro ; ClassNN = "Static3" according to Window Spy
+
 ; Keep trying to login, as it doesn't always work the first time :(
 loop {
   Send ^l
@@ -92,6 +155,10 @@ loop {
 ; -------------------------------
 
 ; ------------------------------- Part 1 | System configuration -------------------------------
+; Modify the waiting window
+GuiControl, hide, Static3
+Gui, Add, Text, w300 h100 Center, Start up progress:`n`n    [X] Starting dependant programs`n    [X] Logging into Toadwater`n    [*] Gathering system information`n    [ ] Calibrating macro ; ClassNN = "Static4" according to Window Spy
+
 SysGet, windowBorder, 31 ; The height, in pixels, of the window border enclosing the Toadwater application
 Sysget, menuHeight, 15 ; The height, in pixels, of the Toadwater application menu
 SysGet, workableArea, MonitorWorkArea ; The area, in pixels, that a window may consume (screen height - task bar height)
@@ -99,54 +166,33 @@ screenWidth := workableAreaRight ; The width of the screen that a window may con
 screenHeight := workableAreaBottom ; The height of the screen that a window may consume, in pixels
 
 ; ------------------------------- Part 2 | Application specifications -------------------------------
-; Modify the waiting window
-GuiControl, hide, Static1
-Gui, Add, Text, x0 y30 w300 Center cBlack, Please wait while the marco is configured...`nDo not move your mouse during this process  ; ClassNN = "Static1" according to Window Spy
-
-; Scan recursively for the left end (a.k.a the width) of the dock bar
-MouseMove, screenWidth, screenHeight - 10
-sleep 1000
-
-; Find the width of the dockbar
-dockBarWidth = 0
+GuiControl, hide, Static4
+Gui, Add, Text, x10 y10 w300, Start up progress:`n`n    [X] Starting dependant programs`n    [X] Logging into Toadwater`n    [X] Gathering system information`n    [*] Calibrating macro ; ClassNN = "Static5 according to Window Spy
 
 loop {
-  global dockBarWidth
-
-; Move the mouse to the appropriate location
-  MouseMove, screenWidth - A_Index, screenHeight - 10
-
-; Parse the color from Window Spy
-  WinGetText, color, Active Window Info (Shift-Alt-Tab to freeze display)
-  colorPos := InStr(color, "0x")
-  StringTrimLeft, colorTrim, color, colorPos - 1
-  StringSplit, colorParsed, colorTrim, %A_Space%
+; Modify the waiting window
+  Gui, Show, yCenter h150, Start up ; Resize the window, to make room for the important message bar
   
-  if (colorParsed1 != 0xF0F0F0) {
-    dockBarWidthGuess := A_Index ; A closeish guess of the width, in pixels, of the right-side dock bar
-  
-  ; Odds are, we went too fast and lost some precision... so do some fine tuning
-    loop {
-    ; Move the mouse to the appropriate location
-      MouseGetPos mouseX, mouseY
-      MouseMove, mouseX + 1, screenHeight - 10
-      sleep 750
-      
-    ; Parse the color from Window Spy
-      WinGetText, criticalColor, Active Window Info (Shift-Alt-Tab to freeze display)
-      criticalColorPos := InStr(criticalColor, "0x")
-      StringTrimLeft, criticalColorTrim, criticalColor, criticalColorPos - 1
-      StringSplit, criticalColorParsed, criticalColorTrim, %A_Space%
-      
-      if (criticalColorParsed1 = 0xF0F0F0) {
-        dockBarWidth := dockBarWidthGuess - A_Index ; The width, in pixels, of the right-side dock bar
-        break
-      }
-    }
-    
+; Ensure that the Toadwater window has focus
+  WinActivate, %parsedName%
+
+; Find the width of the dockbar
+  dockBarWidth := dockBarWidth()
+
+; Hmm... that's a bit big, perhaps some of the sub-widows got stacked side-by-side?
+  if (dockBarWidth > 200) {
+    Gui, Show, y75 h100, Start up
+    MsgBox, 4, Calibration alert, Your Toadwater dockbar looks like its pretty wide. Do you have your "Inventory" docked in the top right corner of your Toadwater window, with your "Info Center" docked directly below it?`n`nBasically, you should have 1 column of docked windows on the right side of your screen, and they should only take up a relatively small percentage of your screen's width.`n`nIf that is not the case:`n  [1] Arrange the docked windows in the order described above`n        by dragging them by their drag handles to the appropriate order`n  [2] Click "No" to have the accelerator re-calibrate`n`nIf the windows have been setup as described above:`n  [1] Then click "Yes" to contine
+     
+    IfMsgBox Yes
+      break
+  } else {
     break
   }
 }
+
+; Ensure that the Toadwater window has focus
+WinActivate, %parsedName%
 
 ; Destroy the waiting window
 Gui, Destroy
