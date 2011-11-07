@@ -90,20 +90,22 @@ loop
     					
     					mouseMove(Ceil(cellsX / 2) - 1, Ceil(cellsY / 2))
                         
-                        if (is(balsamFir))
-                        {
-                              selectTool("Crude Axe")
+                        		if (is(balsamFir))
+                        		{
+                              			selectTool("Crude Axe")
                               
-                              loop 10
-                              {
-                                   Send {Right}
-                                   queueEmpty()
-				   checkHealth()
-                              }
-                        }
+                              			loop 10
+                              			{
+                                   		Send {Right}
+                                   		queueEmpty()
+				   		checkHealth()
+                              			}
+	                        	}
                         
     					selectTool("Balsam Fir Seeds")
     					Send {Right}
+					queueEmpty()
+				   	checkHealth()
     					selectTool("Toadwater Staff")
     					queueEmpty()
 					checkHealth()
@@ -161,9 +163,12 @@ loop
     if(!is(balsamFir))
     {
 	selectTool("Balsam Fir Seeds")
-    Send {Down}
+        Send {Down}
+	queueEmpty()
+   	checkHealth()
 	selectTool("Toadwater Staff")
     }
+    
     Send {Down}
     
     mouseMove(Ceil(cellsX / 2) - 1, Ceil(cellsY / 2)) ; checks for blank square to left for digging/outhouse
@@ -173,6 +178,7 @@ loop
 	MsgBox The square to the dwarf's left does not compute as "diggable", if this is wrong, just unpause the script. If it is correct, make the hole diggable of find a different spot and restart the script from the beginning.
 	Pause, On
     }
+
     loop 
     {
         if (itemNum("Dried Poo") >= 1101) ; this will save at least on spot for dried poo in the inventory
@@ -193,6 +199,9 @@ loop
     		}
     		selectTool("Class 1 Outhouse Materials")
     		Send {Left}
+		queueEmpty()
+	   	checkHealth()
+
     		selectTool("Toadwater Staff")
     		loop 20
     		{
@@ -239,6 +248,9 @@ loop
     		meY = Ceil(cellsY / 2)
     			
     		click(meX, meY) ; clicks position of avatar
+		queueEmpty()
+	   	checkHealth()
+
     		IfWinExist, Crop View
 		{
 			x = 30
@@ -295,6 +307,8 @@ loop
 		checkHealth()
     		selectTool("Radish Seed")
     		Send {Right}
+		queueEmpty()
+	   	checkHealth()
     		selectTool("Toadwater Staff")
     		queueEmpty()
 		checkHealth()
@@ -317,6 +331,9 @@ loop
     		meY = Ceil(cellsY / 2)
     			
     		click(meX, meY) ; clicks position of avatar
+		queueEmpty()
+	   	checkHealth()
+
     		IfWinExist, Crop View
 		{
 			x = 30
@@ -373,6 +390,8 @@ loop
 		checkHealth()
     		selectTool("Radish Seed")
     		Send {Right}
+		queueEmpty()
+	   	checkHealth()
     		selectTool("Toadwater Staff")
     		queueEmpty()
 		checkHealth()
