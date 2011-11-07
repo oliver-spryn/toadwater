@@ -94,6 +94,10 @@ inventory(action) {
       Gui, Add, Text, x%textX% y%textY%, %A_Index%.
       Gui, Add, Edit, x%inputX% y%inputY%
     }
+    
+    Gui, Font, h100 w100 cFF0000, Arial ; Set the font properties for the important text
+    Gui, Add, Text, x400 y270 BackgroundTrans, In order for this script to run by`nitself your inventory must contain: ; ClassNN = "Static26" according to Window Spy
+    Gui, Font, s10 c000000 ; Clear the font properties
   } else if (action = "hide") {
     GuiControl, hide, Static5
     
@@ -104,6 +108,8 @@ inventory(action) {
       GuiControl, hide, Static%static%
       GuiControl, hide, Edit%edit%
     }
+    
+    GuiControl, hide, Static26
   } else {
     GuiControl, show, Static5
     
@@ -114,6 +120,8 @@ inventory(action) {
       GuiControl, show, Static%static%
       GuiControl, show, Edit%edit%
     }
+    
+    GuiControl, show, Static26
   }
 }
 
@@ -127,14 +135,14 @@ review(action) {
   tertiaryText = Inventory:
 
   if (action = "create") {
-    Gui, Add, Text, x10 y60, %mainText% ; ClassNN = "Static26" according to Window Spy
+    Gui, Add, Text, x10 y60, %mainText% ; ClassNN = "Static27" according to Window Spy
     
-    Gui, Add, Text, x10 y100, %secondaryText%  ; ClassNN = "Static27" according to Window Spy
-    Gui, Add, Text, x20 y120, %windowName% ; ClassNN = "Static28" according to Window Spy
+    Gui, Add, Text, x10 y100, %secondaryText%  ; ClassNN = "Static28" according to Window Spy
+    Gui, Add, Text, x20 y120, %windowName% ; ClassNN = "Static29" according to Window Spy
     
-    Gui, Add, Text, x200 y100, %tertiaryText% ; ClassNN = "Static29" according to Window Spy
+    Gui, Add, Text, x200 y100, %tertiaryText% ; ClassNN = "Static30" according to Window Spy
     
-  ; Text ClassNN ranges from Static30 to Static49
+  ; Text ClassNN ranges from Static31 to Static50
     loop 20 {
       if (A_Index <= 15) {
         textX := 210
@@ -147,13 +155,13 @@ review(action) {
       Gui, Add, Text, x%textX% y%textY% w240, 
     }
   } else if (action = "hide") {  
-    GuiControl, hide, Static26
     GuiControl, hide, Static27
     GuiControl, hide, Static28
     GuiControl, hide, Static29
+    GuiControl, hide, Static30
     
     loop 20 {
-      static := A_Index + 29
+      static := A_Index + 30
       edit := A_Index + 22
       
       GuiControl, hide, Static%static%
@@ -161,15 +169,15 @@ review(action) {
     }
   } else {
   ; Since the below values are linked to variables, they must be manually updated each time :(
-    GuiControl, show, Static26
     GuiControl, show, Static27
     GuiControl, show, Static28
-    GuiControl, move, Static28, w240 ; And we need to re-adjust the width! Why???
-    GuiControl,, Static28, %windowName%
     GuiControl, show, Static29
+    GuiControl, move, Static29, w240 ; And we need to re-adjust the width! Why???
+    GuiControl,, Static29, %windowName%
+    GuiControl, show, Static30
     
     loop 20 {
-      static := A_Index + 29
+      static := A_Index + 30
       edit := A_Index + 22
       
       GuiControl, show, Static%static%
@@ -191,11 +199,11 @@ layout(action) {
   mainText = Please open your Toadwater client, and follow the directions below:`n`n  [1] Enter your username and password in the Toadwater login window, and tick the "Remember Password"`n       checkbox.`n`n  [2] Close all sub-windows and docks inside of Toadwater, such as construction, textile, etc...`n`n  [3] Open the "Inventory" window by going to View > Inventory, and dock it in the top right corner of the`n       Toadwater window.`n`n  [4] Open the "Info Center" window by going to View > Info Center, and dock it in right below the docked`n       "Inventory" window.`n`n  [5] Adjust the game's color settings by going to Game > Options, and tick the "Always show color tiles"`n       checkbox.
   
   if (action = "create") {
-    Gui, Add, Text, x10 y60, %mainText% ; ClassNN = "Static50" according to Window Spy
+    Gui, Add, Text, x10 y60, %mainText% ; ClassNN = "Static51" according to Window Spy
   } else if (action = "hide") {
-    GuiControl, hide, Static50
+    GuiControl, hide, Static51
   } else {
-    GuiControl, show, Static50
+    GuiControl, show, Static51
   }
 }
 
@@ -206,11 +214,11 @@ authorize(action) {
   mainText = In order for the Toadwater Accelerator to better locate key objects on your screen, the installer will replace`nthe default icons for several Toadwater objects with ones the macro will better recognize.`nThese objects include:`n`n    - Balsam Fir Tree`n    - Radish Crop Growth from 0 - 100 percent`n    - Ground Fertilization from 0 - 100 percent`n    - The Outhouse`n    - The Ground`n`n`n`n`n`n`n`n`n`n`n`n`nClick "Next" to authorize this action.
   
   if (action = "create") {
-    Gui, Add, Text, x10 y60, %mainText% ; ClassNN = "Static51" according to Window Spy
+    Gui, Add, Text, x10 y60, %mainText% ; ClassNN = "Static52" according to Window Spy
   } else if (action = "hide") {
-    GuiControl, hide, Static51
+    GuiControl, hide, Static52
   } else {
-    GuiControl, show, Static51
+    GuiControl, show, Static52
   }
 }
 
@@ -221,11 +229,11 @@ finish(action) {
   mainText = The Toadwater Accelerator now has enough information about your system to play this game automatically.`nYou will not be required to run through this setup again, as your configuration has been saved to:`n%configFile%`n`nClick "Finish" below, and the Accelerator will close your existing Toadwater window, log in again as you,`nand being gameplay.
   
   if (action = "create") {
-    Gui, Add, Text, x10 y60, %mainText% ; ClassNN = "Static52" according to Window Spy
+    Gui, Add, Text, x10 y60, %mainText% ; ClassNN = "Static53" according to Window Spy
   } else if (action = "hide") {
-    GuiControl, hide, Static52
+    GuiControl, hide, Static53
   } else {
-    GuiControl, show, Static52
+    GuiControl, show, Static53
   }
 }
 
