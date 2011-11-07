@@ -1,13 +1,12 @@
+#p::Pause
+;#d::ExitApp
 #Include framework\include.ahk
+#r::
 
 ; you must start with a 7x7 ground free of anything
 ; start in the top left corner of your area
 ; WARNING: IF ANY OF YOUR TOOLS ARE CLOSE TO FAILING, WE RECOMMEND YOU RESTOCK BEFORE RUNNING THIS PROGRAM. WE CAN GUARANTEE YOU WONT DIE (WE HOPE) BUT NO PROMISES.
 ; to run this program, you must start with at least one of each of the following: class one outhouse, balsam fir seed, balsam fir wood, Grade 1 Plank, radish seeds, dried poo, toadwater staff, crude axe, shovel
-
-; check for seeds------------------------------------------------------------------------------------------------------------------------------------------------------------------
-; check for Rseed------------------------------------------------------------------------------------------------------------------------------------------------------------------
-; check for ect.-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 selectTool("Toadwater Staff")
 Send {Right}
