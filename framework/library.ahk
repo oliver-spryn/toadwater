@@ -377,11 +377,10 @@ queueEmpty() {
              break
           }
         }
-      
-        return true
-        break
       }
     }
+    return true
+    break
   }
 }
 

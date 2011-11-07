@@ -1,7 +1,4 @@
 #Include framework\include.ahk
-#d::ExitApp ; This will exit out of the script at any time by Pressing Win+d
-#p::Pause ; Pauses the script
-#f:: ; starts the script
 
 ; you must start with a 7x7 ground free of anything
 ; start in the top left corner of your area
@@ -150,13 +147,17 @@ loop
     }
     
     mouseMove(Ceil(cellsX / 2), Ceil(cellsY / 2) - 1) ; checks for the eating tree, if not, it plants a tree there.
-    if(is(balsamFir))
-    else
+
+    if(!is(balsamFir))
     {
 	selectTool("Balsam Fir Seeds")
-    	Send {Down}
+    Send {Down}
 	selectTool("Toadwater Staff")
     }
+    Send {Down}
+    
+    mouseMove(Ceil(cellsX / 2) - 1, Ceil(cellsY / 2)) ; checks for blank square to left for digging/outhouse
+    
     if(!is(sand))
     {
 	MsgBox The square to the dwarf's left does not compute as "diggable", if this is wrong, just unpause the script. If it is correct, make the hole diggable of find a different spot and restart the script from the beginning.
