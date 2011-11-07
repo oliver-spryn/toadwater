@@ -149,7 +149,7 @@ cellColor(x, y) {
 
 ; Get the color code for a corresponding cell
 getColorCode(x, y) {
-  MouseMove(x, y)
+  mouseMove(x, y)
   sleep 1000
   MsgBox % getColor()
 }
@@ -390,6 +390,17 @@ getLocus() {
   StringUpper, yUpper, yLocus1
   
   return xLocus A_Space xUpper A_Space yLocus A_Space yUpper
+}
+
+; Return the user's amount of gold
+getGold() {
+  WinGetText, gold, Active Window Info (Shift-Alt-Tab to freeze display)
+  sleep 75
+  keywordPos := InStr(gold, "Gold:")
+  StringTrimLeft, goldTrim, gold, keywordPos - 1
+  StringSplit, goldParsed, goldTrim, `n
+  
+  return goldParsed3
 }
 
 ; Go to a given cell, avoid obsticles, and maintain health
