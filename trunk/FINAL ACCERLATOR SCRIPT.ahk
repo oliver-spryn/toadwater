@@ -24,7 +24,26 @@ Send {Right}
 loop
 {
     loop
-    {
+    {	
+	if (itemNum("Balsam Fir Seeds") < 37)
+	{
+		loop 6
+		{
+			Send {Down}
+			queueEmpty()
+		}
+		selectTool("Blister Shovel")
+		if (itemNum("Balsam Fir Seeds") < 37)
+		{
+			Send {Left}
+			queueEmpty()
+		}
+		loop 6
+		{
+			Send {Up}
+			queueEmpty()
+		}	
+	}
         if (itemNum("Class 1 Outhouse Materials") >= 12) ; the 12 means that when 11 outhouses are "used", there will be at least one left to save its inv spot
 	{
           break
@@ -131,10 +150,18 @@ loop
     }
     
     mouseMove(Ceil(cellsX / 2), Ceil(cellsY / 2) - 1) ; checks for the eating tree, if not, it plants a tree there.
-    ; we still need to add in the check ---------------------------------------------------------------------------------------------------------------------
-    selectTool("Balsam Fir Seeds")
-    Send {Down}
-    ; we should have a check for the left square to make sure its empty and ready to be "dug on"-------------------------------------------------------------------------------------
+    if(is(balsamFir))
+    else
+    {
+	selectTool("Balsam Fir Seeds")
+    	Send {Down}
+	selectTool("Toadwater Staff")
+    }
+    if(!is(sand))
+    {
+	MsgBox The square to the dwarf's left does not compute as "diggable", if this is wrong, just unpause the script. If it is correct, make the hole diggable of find a different spot and restart the script from the beginning.
+	Pause, On
+    }
     loop 
     {
         if (itemNum("Dried Poo") >= 1101) ; this will save at least on spot for dried poo in the inventory
@@ -232,6 +259,7 @@ loop
     			Send {Right}
     			queueEmpty()
     		}
+		numGold := getGold()
 		if (numGold < 100)
 		{
 			MsgBox You don't have enough gold to buy any radish seeds. Please sell unnesccesary inventory items and unpause the script.
@@ -302,7 +330,7 @@ loop
     			Send {Right}
     			queueEmpty()
     		}
-		numGold = getGold
+		numGold := getGold()
 		if (numGold < 100)
 		{
 			MsgBox You don't have enough gold to buy any radish seeds. Please sell unnesccesary inventory items and unpause the script.
