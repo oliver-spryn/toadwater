@@ -119,14 +119,21 @@ click(x, y) {
 }
 
 ; Get the hexadecimal color under the pointer
-getColor() {
+getColor(type = "fast") {
+; Good most any color matching that is needed, such as the colors of the gameplay tiles
+  if (type = "fast") {
+    MouseGetPos mouseX, mouseY
+    PixelGetColor color, %mouseX%, %mouseY%, RGB
+    return color
 ; This is mainly used whenever evaluating color-coded information on the dockbar
-  WinGetText, color, Active Window Info (Shift-Alt-Tab to freeze display)
-  sleep 75
-  colorPos := InStr(color, "0x")
-  StringTrimLeft, colorTrim, color, colorPos - 1
-  StringSplit, colorParsed, colorTrim, %A_Space%
-  return colorParsed1
+  } else {
+    WinGetText, color, Active Window Info (Shift-Alt-Tab to freeze display)
+    sleep 75
+    colorPos := InStr(color, "0x")
+    StringTrimLeft, colorTrim, color, colorPos - 1
+    StringSplit, colorParsed, colorTrim, %A_Space%
+    return colorParsed1
+  }
 }
 
 ; Focus the PixelGetColor to a particular X and Y cell
@@ -142,14 +149,13 @@ cellColor(x, y) {
 
 ; Get the color code for a corresponding cell
 getColorCode(x, y) {
-  cellColor(x, y)
+  MouseMove(x, y)
   sleep 1000
   MsgBox % getColor()
 }
 
 ; Check and see if the current cell contains a specific object
-is(object, x, y) {
-  mouseMove(x, y)
+is(object) {
   sleep 100
   
   if (getColor() = object) {
@@ -311,19 +317,13 @@ monitor(bar) {
   global windowBorder, menuHeight, screenWidth, dockBarWidth, healthGood, healthFair, healthPoor, pooMeter, queueMeter
   
   if (bar = "health") {
-    WinGetText, health, Active Window Info (Shift-Alt-Tab to freeze display)
-    sleep 75
-    StringSplit, healthSplit, health, %A_Space%/%A_Space%
-    StringSplit, healthParsed, healthSplit, `n
+    barX := screenWidth - dockBarWidth + 15
+    barY := 570 + windowBorder + menuHeight
     
-    loop {
-      if (healthParsed%A_Index% = "") {
-        lastOne := A_Index - 1
-        barInfo := healthParsed%lastOne%
-        break
-      }
-    }
-    MsgBox % healthParsed1
+    MouseMove, %barX%, %barY%
+    sleep 1000
+    
+    barColor := getColor("critical")
     
     if (barColor = healthGood) {
       return "good"
@@ -334,11 +334,12 @@ monitor(bar) {
     }
   } else if (bar = "poo") {
     barX := screenWidth - dockBarWidth + 115
-    barY := 595 + windowBorder + menuHeight
-    barColor := getColor("critical")
+    barY := 590 + windowBorder + menuHeight
     
     MouseMove, %barX%, %barY%
     sleep 1000
+    
+    barColor := getColor("critical")
     
     if (barColor = pooMeter) {
       return "poor"
@@ -346,12 +347,13 @@ monitor(bar) {
       return "good"
     }
   } else {
-    barX := screenWidth - dockBarWidth + 5
-    barY := 605 + windowBorder + menuHeight
-    barColor := getColor("critical")
+    barX := screenWidth - dockBarWidth + 15
+    barY := 600 + windowBorder + menuHeight
     
     MouseMove, %barX%, %barY%
     sleep 1000
+    
+    barColor := getColor("critical")
     
     if (barColor = queueMeter) {
       return "poor"
