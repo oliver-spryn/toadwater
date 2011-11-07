@@ -26,18 +26,21 @@ loop
 		{
 			Send {Down}
 			queueEmpty()
+			checkHealth()
 		}
 		selectTool("Blister Shovel")
 		if (itemNum("Balsam Fir Seeds") < 37)
 		{
 			Send {Left}
 			queueEmpty()
+			checkHealth()
 		}
 		selectTool("Toadwater Staff")
 		loop 6
 		{
 			Send {Up}
 			queueEmpty()
+			checkHealth()
 		}	
 	}
         if (itemNum("Class 1 Outhouse Materials") >= 12) ; the 12 means that when 11 outhouses are "used", there will be at least one left to save its inv spot
@@ -68,6 +71,7 @@ loop
     					      {
     					           Send {Right}
     					           queueEmpty()
+						   checkHealth()
     					      }
     					}
     					
@@ -77,6 +81,7 @@ loop
     					
     					selectTool("Toadwater Staff")
     					queueEmpty()
+			                checkHealth()
     				}
     				Send {Down}
     				loop 5
@@ -93,6 +98,7 @@ loop
                               {
                                    Send {Right}
                                    queueEmpty()
+				   checkHealth()
                               }
                         }
                         
@@ -100,6 +106,7 @@ loop
     					Send {Right}
     					selectTool("Toadwater Staff")
     					queueEmpty()
+					checkHealth()
     				}
     				Send {Down}
     			}
@@ -108,6 +115,7 @@ loop
     			{
     				Send {Up}
     				queueEmpty()
+				checkHealth()
     			}
     		}
     	}
@@ -118,6 +126,7 @@ loop
     	{
     		Send p ; whittles planks
     		queueEmpty()
+		checkHealth()
     	} 
     	
 	selectTool("Grade 1 Plank")
@@ -127,6 +136,7 @@ loop
     	{
     		Send o ; builds outhouses
     		queueEmpty()
+		checkHealth()
     	}
     }
     
@@ -143,6 +153,7 @@ loop
     {
     	Send {Down}
     	queueEmpty()
+	checkHealth()
     }
     
     mouseMove(Ceil(cellsX / 2), Ceil(cellsY / 2) - 1) ; checks for the eating tree, if not, it plants a tree there.
@@ -178,6 +189,7 @@ loop
     		{
     			Send {Left}
     			queueEmpty()
+			checkHealth()
     		}
     		selectTool("Class 1 Outhouse Materials")
     		Send {Left}
@@ -188,17 +200,21 @@ loop
     			{
     				Send e
     				queueEmpty()
+				checkHealth()
     			}
     			Send {Left}
     			queueEmpty()
+			checkHealth()
     			Send {Right}
     			queueEmpty()
+			checkHealth()
     		}
     		selectTool("Blister Shovel")
     		loop 50
     		{
     			Send {Left}
     			queueEmpty()
+			checkHealth()
     		}
     	}
     }
@@ -234,6 +250,7 @@ loop
     		        		ControlClick x%x% y%y%, Crop View
         		     		x := x + 55
         		     		queueEmpty()
+					checkHealth()
     	       	     	 	}
 			
     		     	}
@@ -247,6 +264,7 @@ loop
 		}    
         	Send {Left}
     		queueEmpty()
+		checkHealth()
     	}
         
 	mouseMove(Ceil(cellsX / 2) + 1, Ceil(cellsY / 2))
@@ -258,6 +276,7 @@ loop
     		{
     			Send {Right}
     			queueEmpty()
+			checkHealth()
     		}
 		numGold := getGold()
 		if (numGold < 100)
@@ -267,21 +286,25 @@ loop
 		}
 		Send {Ctrl Down} b {Ctrl Up}
 		queueEmpty()
+		checkHealth()
 		Click 269, 107
 		Sleep 3000
 		Send 100
 		Send {Enter} {Enter}
 		queueEmpty()
+		checkHealth()
     		selectTool("Radish Seed")
     		Send {Right}
     		selectTool("Toadwater Staff")
     		queueEmpty()
+		checkHealth()
     	}
     	Send {Right}
     }
     
     Send {Left} {Up}
     queueEmpty()
+    checkHealth()
     
     loop 5
     {
@@ -305,6 +328,7 @@ loop
     		        		ControlClick x%x% y%y%, Crop View
         		     		x := x + 55
         		     		queueEmpty()
+					checkHealth()
     	       	     	 	}
 			
     		     	}
@@ -318,6 +342,7 @@ loop
 		}    
         	Send {Left}
     		queueEmpty()
+		checkHealth()
     	}        
         
 	mouseMove(Ceil(cellsX / 2) + 1, Ceil(cellsY / 2))
@@ -329,6 +354,7 @@ loop
     		{
     			Send {Right}
     			queueEmpty()
+			checkHealth()
     		}
 		numGold := getGold()
 		if (numGold < 100)
@@ -338,15 +364,18 @@ loop
 		}
 		Send {Ctrl Down} b {Ctrl Up}
 		queueEmpty()
+		checkHealth()
 		Click 269, 107
 		Sleep 3000
 		Send 100
 		Send {Enter} {Enter}
 		queueEmpty()
+		checkHealth()
     		selectTool("Radish Seed")
     		Send {Right}
     		selectTool("Toadwater Staff")
     		queueEmpty()
+		checkHealth()
     	}
     	Send {Up}
     }
@@ -355,5 +384,6 @@ loop
     {
     	Send {Left}
     	queueEmpty()
+	checkHealth()
     }
 }
