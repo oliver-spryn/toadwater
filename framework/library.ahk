@@ -367,8 +367,20 @@ monitor(bar) {
 queueEmpty() {
   loop {
     if (monitor("queue") = "good") {
-      return true
-      break
+      if (monitor("health")="poor") {
+        loop {
+          if (monitor("health")="good") {
+            break
+          }
+          
+          if (monitor("health")="fair") {
+             break
+          }
+        }
+      
+        return true
+        break
+      }
     }
   }
 }

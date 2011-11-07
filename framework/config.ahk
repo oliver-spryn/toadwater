@@ -150,6 +150,9 @@ loop {
   }
 }
 
+; Adjust the view to full-zoom
+Send ^1
+
 ; -------------------------------
 ; Configuration
 ; -------------------------------
