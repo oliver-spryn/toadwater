@@ -8,8 +8,7 @@
 ; to run this program, you must start with at least one of each of the following: class one outhouse, balsam fir seed, balsam fir wood, Grade 1 Plank, radish seeds, dried poo, toadwater staff, crude axe, shovel
 
 selectTool("Toadwater Staff")
-queueEmpty()
-checkHealth()
+
 ; -----------------------------------------------------------------------------------------
 ; -----------------------------------------------------------------------------------------
 ; -----------------------------------------------------------------------------------------
