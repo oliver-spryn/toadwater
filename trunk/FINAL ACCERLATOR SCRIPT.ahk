@@ -8,7 +8,8 @@
 ; to run this program, you must start with at least one of each of the following: class one outhouse, balsam fir seed, balsam fir wood, Grade 1 Plank, radish seeds, dried poo, toadwater staff, crude axe, shovel
 
 selectTool("Toadwater Staff")
-Send {Right}
+queueEmpty()
+checkHealth()
 ; -----------------------------------------------------------------------------------------
 ; -----------------------------------------------------------------------------------------
 ; -----------------------------------------------------------------------------------------
@@ -29,11 +30,18 @@ loop
 			checkHealth()
 		}
 		selectTool("Blister Shovel")
-		if (itemNum("Balsam Fir Seeds") < 37)
+		loop
 		{
-			Send {Left}
-			queueEmpty()
-			checkHealth()
+			if (itemNum("Balsam Fir Seeds") < 37)
+			{
+				Send {Left}
+				queueEmpty()
+				checkHealth()
+			}
+			else
+			{
+				break
+			}
 		}
 		selectTool("Toadwater Staff")
 		loop 6
@@ -60,7 +68,6 @@ loop
     				loop 5
     				{	
     					Send {Right}
-    					
     					mouseMove(Ceil(cellsX / 2) - 1, Ceil(cellsY / 2))
     					
     					if (is(balsamFir))
@@ -76,17 +83,17 @@ loop
     					}
     					
     					selectTool("Balsam Fir Seeds")
-    					
     					Send {Left}
-    					
+    					queueEmpty()
+			                checkHealth()
     					selectTool("Toadwater Staff")
     					queueEmpty()
 			                checkHealth()
+
     				}
     				Send {Down}
     				loop 5
-    				{	
-    					Send {Left}
+    				{
     					
     					mouseMove(Ceil(cellsX / 2) - 1, Ceil(cellsY / 2))
                         
@@ -103,17 +110,18 @@ loop
 	                        	}
                         
     					selectTool("Balsam Fir Seeds")
-    					Send {Right}
+    					Send {Left}
 					queueEmpty()
 				   	checkHealth()
     					selectTool("Toadwater Staff")
     					queueEmpty()
 					checkHealth()
+					Send {Left}
     				}
     				Send {Down}
     			}
     			selectTool("Toadwater Staff")
-    			loop 5
+    			loop 6
     			{
     				Send {Up}
     				queueEmpty()
