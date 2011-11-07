@@ -365,20 +365,27 @@ monitor(bar) {
 
 ; Wait until the queue is empty
 queueEmpty() {
+  sleep 3000
+  
   loop {
     if (monitor("queue") = "good") {
-      if (monitor("health")="poor") {
+      sleep 1500
+      
+      if (monitor("health") = "poor") {
+        sleep 1500
+      
         loop {
-          if (monitor("health")="good") {
+          sleep 1500
+        
+          if (monitor("health") != "poor") {
             break
           }
-          
-          if (monitor("health")="fair") {
-             break
-          }
         }
+        
+        sleep 1500
       }
     }
+    
     return true
     break
   }
