@@ -369,26 +369,24 @@ queueEmpty() {
   
   loop {
     if (monitor("queue") = "good") {
-      sleep 1500
-      
-      if (monitor("health") = "poor") {
-        sleep 1500
-      
-        loop {
-          sleep 1500
-        
-          if (monitor("health") != "poor") {
-            break
-          }
-        }
-        
-        sleep 1500
-      }
+      break
     }
-    
-    return true
-    break
   }
+  
+  return true
+}
+
+; Check the user's health
+checkHealth() {
+  sleep 3000
+
+  loop {
+    if (monitor("health") != "poor") {
+      break
+    }
+  }
+  
+  return true
 }
 
 ; Get the locus (overall gameplay coordinates) from the information bar
