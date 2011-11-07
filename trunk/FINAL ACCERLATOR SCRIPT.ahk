@@ -1,7 +1,6 @@
-#p::Pause
+;#p::Pause
 ;#d::ExitApp
 #Include framework\include.ahk
-#r::
 
 ; you must start with a 7x7 ground free of anything
 ; start in the top left corner of your area
@@ -34,6 +33,7 @@ loop
 			Send {Left}
 			queueEmpty()
 		}
+		selectTool("Toadwater Staff")
 		loop 6
 		{
 			Send {Up}
