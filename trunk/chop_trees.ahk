@@ -1,2 +1,2 @@
 #Include framework\include.ahk
-goTo(7,6)
+MsgBox % getLocus()
