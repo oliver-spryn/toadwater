@@ -318,7 +318,7 @@ monitor(bar) {
   
   if (bar = "health") {
     barX := screenWidth - dockBarWidth + 15
-    barY := 570 + windowBorder + menuHeight
+    barY := 575 + windowBorder + menuHeight
     
     MouseMove, %barX%, %barY%
     sleep 1000
@@ -334,7 +334,7 @@ monitor(bar) {
     }
   } else if (bar = "poo") {
     barX := screenWidth - dockBarWidth + 115
-    barY := 590 + windowBorder + menuHeight
+    barY := 595 + windowBorder + menuHeight
     
     MouseMove, %barX%, %barY%
     sleep 1000
@@ -348,7 +348,7 @@ monitor(bar) {
     }
   } else {
     barX := screenWidth - dockBarWidth + 15
-    barY := 600 + windowBorder + menuHeight
+    barY := 605 + windowBorder + menuHeight
     
     MouseMove, %barX%, %barY%
     sleep 1000

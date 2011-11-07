@@ -34,17 +34,20 @@ if (!A_IsAdmin) {
 
 ; Create and manipulate the welcome page
 welcome(action) {
-  mainText = Welcome to the Toadwater Accelerator Setup Wizard!`n`nThese series of steps will guide you through the process of configuring this marco for your system.`nThrough out this short process, you will:`n`n - Supply your Toadwater username`n - Enter your current list of inventory items`n - Prepare Toadwater for optimal usage`n - Authorize the replacement default images
+  mainText = Welcome to the Toadwater Accelerator Setup Wizard!`n`nThese series of steps will guide you through the process of configuring this marco for your system.`nThrough out this short process, you will:`n`n  - Supply your Toadwater username`n  - Enter your current list of inventory items`n  - Prepare Toadwater for optimal usage`n  - Authorize the replacement default images`n`nFor this setup, you will need to open Toadwater as the administrator. Click the button below to launch`nToadwater as the administrator:
   secondaryText = Click "Next" to continue.
   
   if (action = "create") {
     Gui, Add, Text, x10 y60 BackgroundTrans, %mainText% ; ClassNN = "Static2" according to Window Spy
+    Gui, Add, Button, x10 y275 w100, Launch ; ClassNN = "Button4" according to Window Spy
     Gui, Add, Text, x10 y397 BackgroundTrans, %secondaryText% ; ClassNN = "Static3" according to Window Spy
   } else if (action = "hide") {
     GuiControl, hide, Static2
+    GuiControl, hide, Button4
     GuiControl, hide, Static3
   } else {
     GuiControl, show, Static2
+    GuiControl, show, Button4
     GuiControl, show, Static3
   }
 }
@@ -96,7 +99,7 @@ inventory(action) {
     }
     
     Gui, Font, h100 w100 cFF0000, Arial ; Set the font properties for the important text
-    Gui, Add, Text, x400 y270 BackgroundTrans, In order for this script to run by`nitself your inventory must contain: ; ClassNN = "Static26" according to Window Spy
+    Gui, Add, Text, x400 y270 BackgroundTrans, In order for this script to run by`nitself your inventory must contain:`n  - Blister Shovel (1)`n  - Balsam Fir Seeds (37)`n  - Class 1 Outhouse Materials (1)`n  - Grade 1 Plank (1)`n  - Balsam Fir Wood (1)`n  - Dried Poo (1)`n  - Radish Seeds (1) ; ClassNN = "Static26" according to Window Spy
     Gui, Font, s10 c000000 ; Clear the font properties
   } else if (action = "hide") {
     GuiControl, hide, Static5
@@ -196,7 +199,7 @@ review(action) {
 
 ; Create and manipulate the Toadwater layout instructions page
 layout(action) {
-  mainText = Please open your Toadwater client, and follow the directions below:`n`n  [1] Enter your username and password in the Toadwater login window, and tick the "Remember Password"`n       checkbox.`n`n  [2] Close all sub-windows and docks inside of Toadwater, such as construction, textile, etc...`n`n  [3] Open the "Inventory" window by going to View > Inventory, and dock it in the top right corner of the`n       Toadwater window.`n`n  [4] Open the "Info Center" window by going to View > Info Center, and dock it in right below the docked`n       "Inventory" window.`n`n  [5] Adjust the game's color settings by going to Game > Options, and tick the "Always show color tiles"`n       checkbox.
+  mainText = Please open your Toadwater client, and follow the directions below:`n`n  [1] Enter your username and password in the Toadwater login window, and tick the "Remember Password"`n       checkbox.`n`n  [2] Close all sub-windows and docks inside of Toadwater, such as construction, textile, etc...`n`n  [3] Open the "Inventory" window by going to View > Inventory, and dock it in the top right corner of the`n       Toadwater window.`n`n  [4] Open the "Info Center" window by going to View > Info Center, and dock it in right below the docked`n       "Inventory" window.`n`n  [5] Adjust the game's color settings by going to Game > Options, and untick the "Always show color tiles"`n       checkbox.`n`n  [6] Find an open, unobstructed area of 7 x 7 tiles, and place your character on the top-left tile.
   
   if (action = "create") {
     Gui, Add, Text, x10 y60, %mainText% ; ClassNN = "Static51" according to Window Spy
@@ -457,6 +460,11 @@ if (!FileExist(configFile)) {
     ; Decrement the wizard step counter
       wizardStep--
     }
+  return
+  
+; Actions to perform when the "Launch Toadwater as Administrator" button is clicked
+  ButtonLaunch:
+    Run *RunAs %A_ProgramFiles%\Toadwater\TWC.exe
   return
   
 ; Actions to perform when the "Cancel" button is clicked

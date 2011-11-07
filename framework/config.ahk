@@ -183,7 +183,7 @@ loop {
   dockBarWidth := dockBarWidth()
 
 ; Hmm... that's a bit big, perhaps some of the sub-widows got stacked side-by-side?
-  if (dockBarWidth > 200) {
+  if (dockBarWidth > 275) {
     Gui, Show, y75 h100, Start up
     MsgBox, 4, Calibration alert, Your Toadwater dockbar looks like its pretty wide. Do you have your "Inventory" docked in the top right corner of your Toadwater window, with your "Info Center" docked directly below it?`n`nBasically, you should have 1 column of docked windows on the right side of your screen, and they should only take up a relatively small percentage of your screen's width.`n`nIf that is not the case:`n  [1] Arrange the docked windows in the order described above`n        by dragging them by their drag handles to the appropriate order`n  [2] Click "No" to have the accelerator re-calibrate`n`nIf the windows have been setup as described above:`n  [1] Then click "Yes" to contine
      
