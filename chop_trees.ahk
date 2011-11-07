@@ -1,2 +1,2 @@
 #Include framework\include.ahk
-MsgBox % getLocus()
+MsgBox % getGold()
