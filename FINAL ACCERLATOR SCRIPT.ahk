@@ -12,10 +12,6 @@
 ; check for Rseed------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ; check for ect.-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-numGold = 0
-MsgBox An input box will pop up after you press okay: Please enter the quantity of gold you have using only numbers and (if necessary) a decimal point. (Don't use other punctuations or letters or other misc. characters)
-InputBox, numGold
-
 selectTool("Toadwater Staff")
 Send {Right}
 ; -----------------------------------------------------------------------------------------
@@ -306,6 +302,7 @@ loop
     			Send {Right}
     			queueEmpty()
     		}
+		numGold = getGold
 		if (numGold < 100)
 		{
 			MsgBox You don't have enough gold to buy any radish seeds. Please sell unnesccesary inventory items and unpause the script.
